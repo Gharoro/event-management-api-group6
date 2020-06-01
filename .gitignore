@@ -1,2 +1,4 @@
+#remove .env file
+.env
+#remove node modules
 node_modules
-config/config.json
