@@ -1,7 +1,7 @@
 // All methods related to authentication and authorization should be here.
 import models from "../models";
 import bcrypt from "bcryptjs";
-import { validate } from "jsonschema";
+// import { validate } from "jsonschema";
 import signUpSchema from "./signUpSchema";
 
 //Creating validation before inserting records into the db
@@ -14,20 +14,61 @@ const signUp = async (req, res, next) => {
     logo,
     email,
     password,
+    confirmPassword,
     businessName,
     phoneNum
   } = req.body;
 
-  try {
-    // creating an object to be passed into jsonschema for validation
-    const managerData = {data: req.body};
+  if (
+    !firstName ||
+    !lastName ||
+    !address ||
+    !password ||
+    !confirmPassword ||
+    !businessName ||
+    !phoneNum ||
+    !email
+  ) {
+    return res.status(400).json({
+      status: 400,
+      message: "All fields must be filled"
+    });
+  }
 
-    const validateManager = await validate(managerData, signUpSchema);
-    // If user is not valid throw an error through the error stack otherwise continue with inserting data
-    if (!validateManager.valid){
-      return next(validateManager.errors.map(err => err.stack))
+  if (password !== confirmPassword) {
+    return res.status(400).json({
+      status: 400,
+      message: "Password do not match"
+    });
+  }
+  const phoneNumStr = phoneNum.split("");
+  if (phoneNumStr.length !== 11 || phoneNum.match(/[^0-9]/g)) {
+    return res.status(400).json({
+      status: 400,
+      message: "Phone number must be a number not less than 11 characters"
+    });
+  }
+  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (!re.test(email)) {
+    return res.status(400).json({
+      status: 400,
+      message: "Email do not match correct format"
+    });
+  }
+
+  try {
+    const checkMangers = await models.Manager.findAll({
+      where: { email }
+    });
+    if ((checkMangers.length > 0)) {
+      return res
+        .status(400)
+        .json({
+          status: 400,
+          message:
+            "User already exist please log in or check credentials passed"
+        });
     }
-// hash password before saving into db
     const hashedPassword = await bcrypt.hash(password, 10);
     // Create submit records to the db once validated and password hased
     const managers = await models.Manager.create({
