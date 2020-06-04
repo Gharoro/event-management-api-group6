@@ -1,10 +1,10 @@
 // All routes related to authentication and authorization should be here.
-import {signUp} from '../../controllers/authController';
-import {Router} from 'express';
+import { Router } from 'express';
+import { signUp } from '../../controllers/authController';
 
 const router = Router();
 
-router.post('/signUp', signUp);
+router.post('/signup', signUp);
 
 
 export default router;

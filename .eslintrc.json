@@ -21,6 +21,7 @@
         "camelcase": "off",
         "consistent-return": "off",
         "no-shadow": "off",
-        "object-curly-newline": "off"
+        "object-curly-newline": "off",
+        "no-useless-escape": "off"
     }
 }
