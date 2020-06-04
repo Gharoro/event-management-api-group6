@@ -9,7 +9,6 @@ const signUp = async (req, res, next) => {
     firstName,
     lastName,
     address,
-    logo,
     email,
     password,
     confirmPassword,
@@ -17,13 +16,32 @@ const signUp = async (req, res, next) => {
     phoneNum,
   } = req.body;
 
+  const logo = req.file;
+  const allowedTypes = ['image/png', 'image/jpeg'];
+  if (logo === undefined) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Please upload a logo for your event center',
+    });
+  }
+  if (logo.size > 2000000) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Logo must be less than 2mb',
+    });
+  }
+  if (allowedTypes.indexOf(logo.mimetype) === -1) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Please upload a jpg, jpeg or png file',
+    });
+  }
   if (!firstName || !lastName || !address || !password || !confirmPassword || !businessName || !phoneNum || !email) {
     return res.status(400).json({
       status: 400,
       message: 'All fields must be filled',
     });
   }
-
   if (password !== confirmPassword) {
     return res.status(400).json({
       status: 400,
@@ -44,7 +62,6 @@ const signUp = async (req, res, next) => {
       message: 'Email do not match correct format',
     });
   }
-
   try {
     const checkMangers = await models.Manager.findAll({
       where: { email },
@@ -65,13 +82,14 @@ const signUp = async (req, res, next) => {
       password: hashedPassword,
       businessName,
       phoneNum,
-      logo,
+      logo: logo.path,
     });
     if (managers) {
       // return a success message on completion
       return res.json({
         status: 200,
         message: 'User has been created successfully',
+        user: managers,
       });
     }
     // return an error message on failure

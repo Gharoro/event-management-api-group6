@@ -8,8 +8,11 @@ const app = express();
 // Connecting to database
 connect();
 
+// Body parser
 app.use(express.json());
-app.use(express.urlencoded({ extends: true }));
+app.use(express.urlencoded({ extended: true }));
+
+// morgan
 app.use(morgan('tiny'));
 
 app.use('/api/auth', auth);
