@@ -1,0 +1,1 @@
+// All routes related to centers should be here.
