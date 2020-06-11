@@ -1,7 +1,9 @@
 import express from 'express';
 import morgan from 'morgan';
+import passport from 'passport';
 import connect from './config/dbconnection';
 import auth from './routes/api/auth';
+import passportConfig from './config/passport';
 
 const app = express();
 
@@ -14,6 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // morgan
 app.use(morgan('tiny'));
+
+// Passport middleware
+app.use(passport.initialize());
+passportConfig(passport);
 
 app.use('/api/auth', auth);
 

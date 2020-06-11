@@ -1,7 +1,11 @@
 /* eslint-disable max-len */
 // All methods related to authentication and authorization should be here.
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { config } from 'dotenv';
 import models from '../models';
+
+config();
 
 const signUp = async (req, res, next) => {
   // destructuring data coming from the user
@@ -101,4 +105,55 @@ const signUp = async (req, res, next) => {
     return next(error);
   }
 };
-export { signUp };
+
+const signIn = async (req, res, next) => {
+  const { email, password } = req.body;
+  // check if user inputs email or password
+  if (!email || !password) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Please enter valid credentials',
+    });
+  }
+  try {
+    const managerExist = await models.Manager.findAll({ where: { email } }); // check if user exist
+    if (managerExist.length < 1) {
+      return res.status(404).json({
+        status: 404,
+        message: 'User does not exist! Please check your signin details',
+      });
+    }
+    // extracting relevant information from user database
+    const manager_password = managerExist[0].dataValues.password;
+    const manager_businessname = managerExist[0].dataValues.businessName;
+    const manager_logo = managerExist[0].dataValues.logo;
+    const manager_id = managerExist[0].dataValues.id;
+
+    const passwordMatch = await bcrypt.compare(password, manager_password); // returns true or false
+    if (passwordMatch) {
+      // defining the contents of the payload
+      const payload = {
+        id: manager_id,
+        businessName: manager_businessname,
+        logo: manager_logo,
+      };
+      // signing the token
+      jwt.sign(payload, process.env.secretOrkey, { expiresIn: 10800000 }, (err, token) => {
+        if (err) throw err;
+        return res.status(200).json({
+          status: 200,
+          message: 'Login successful',
+          token: `Bearer ${token}`,
+        });
+      });
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: 'Incorrect Password!',
+      });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+export { signUp, signIn };
