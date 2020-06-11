@@ -1,0 +1,146 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "data": {
+                "firstName": "Jeremiah",
+                "lastName": "Adeleye",
+                "address": "22, pamikinku street",
+                "email": "Jerrycaffe@gmail.com",
+                "password": "jher198jh;'",
+                "businessName": "De potomac events",
+                "phoneNum": "08088492993",
+                "logo": "pick from the given list"
+            }
+        }
+    ],
+    "required": [
+        "data"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "data": {
+            "$id": "#/properties/data",
+            "type": "object",
+            "title": "The root schema",
+            "description": "used to validate managers information ",
+            "default": {},
+            "examples": [
+                {
+                    "firstName": "Jeremiah",
+                    "lastName": "Adeleye",
+                    "address": "22, pamikinku street",
+                    "email": "Jerrycaffe@gmail.com",
+                    "password": "jher198jh;'",
+                    "businessName": "De potomac events",
+                    "phoneNum": "08088492993",
+                    "logo": "pick from the given list"
+                }
+            ],
+            "required": [
+                "firstName",
+                "lastName",
+                "address",
+                "email",
+                "password",
+                "businessName",
+                "phoneNum",
+                "logo"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "firstName": {
+                    "$id": "#/properties/data/properties/firstName",
+                    "type": "string",
+                    "title": "The firstName schema",
+                    "description": "The first name is important",
+                    "default": "",
+                    "examples": [
+                        "Jeremiah"
+                    ]
+                },
+                "lastName": {
+                    "$id": "#/properties/data/properties/lastName",
+                    "type": "string",
+                    "title": "The lastName schema",
+                    "description": "your last name is your surname",
+                    "default": "",
+                    "examples": [
+                        "Adeleye"
+                    ],
+                    "maximum": 100,
+                    "minimum": 2
+                },
+                "address": {
+                    "$id": "#/properties/data/properties/address",
+                    "type": "string",
+                    "title": "The address schema",
+                    "description": "Where you work from",
+                    "default": "",
+                    "examples": [
+                        "22, pamikinku street"
+                    ]
+                },
+                "email": {
+                    "$id": "#/properties/data/properties/email",
+                    "type": "string",
+                    "title": "The email schema",
+                    "description": "To receive updates and all ;provide the company's email",
+                    "default": "",
+                    "examples": [
+                        "Jerrycaffe@gmail.com"
+                    ],
+                    "uniqueItems": true
+                },
+                "password": {
+                    "$id": "#/properties/data/properties/password",
+                    "type": "string",
+                    "title": "The password schema",
+                    "description": "Provide a secured password",
+                    "default": "",
+                    "examples": [
+                        "jher198jh;'"
+                    ]
+                },
+                "businessName": {
+                    "$id": "#/properties/data/properties/businessName",
+                    "type": "string",
+                    "title": "The businessName schema",
+                    "description": "This is the name used to register the event center",
+                    "default": "",
+                    "examples": [
+                        "De potomac events"
+                    ]
+                },
+                "phoneNum": {
+                    "$id": "#/properties/data/properties/phoneNum",
+                    "type": "string",
+                    "title": "The phoneNum schema",
+                    "description": "this must be unique and no two people should have it",
+                    "default": "",
+                    "examples": [
+                        "08088492993"
+                    ],
+                    "uniqueItems": true
+                },
+                "logo": {
+                    "$id": "#/properties/data/properties/logo",
+                    "type": "string",
+                    "title": "The logo schema",
+                    "description": "You are to choose a logo for your company.",
+                    "default": "",
+                    "examples": [
+                        "pick from the given list"
+                    ]
+                }
+            },
+            "maximum": 100,
+            "minimum": 2
+        }
+    }
+}
