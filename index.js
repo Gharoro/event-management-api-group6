@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import passport from 'passport';
 import connect from './config/dbconnection';
 import auth from './routes/api/auth';
+import center from './routes/api/center';
 import passportConfig from './config/passport';
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(passport.initialize());
 passportConfig(passport);
 
 app.use('/api/auth', auth);
+app.use('/api/center', center);
 
 app.get('/', (req, res) => {
   res.send('Event Management Application API - SGA Group 6');
