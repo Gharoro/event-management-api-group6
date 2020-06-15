@@ -12,7 +12,7 @@ const signup = async (req, res, next) => {
       message: "All fields are required"
     });
   }
-  if (firstname.match(/^[a-z]/i))
+  if (!(firstname.trim()).match(/^[A-Za-z]+$/) || !(lastname.trim()).match(/^[A-Za-z]+$/))
   {
     return res.status(400).json({
       status: 400,
@@ -44,7 +44,7 @@ const signup = async (req, res, next) => {
       const checkExist = await models.customers.findOne({
         where: {email}
       });
-      console.log("Check if it exist here", checkExist)
+    //  throw an error if the user alreaddy exist
       if(checkExist){
         return res.status(400).json({
           status: 400,
