@@ -5,6 +5,7 @@ import connect from './config/dbconnection';
 import auth from './routes/api/auth';
 import center from './routes/api/center';
 import passportConfig from './config/passport';
+import customerProfile from './routes/api/customerProfile'
 
 const app = express();
 
@@ -24,6 +25,7 @@ passportConfig(passport);
 
 app.use('/api/auth', auth);
 app.use('/api/center', center);
+
 
 app.get('/', (req, res) => {
   res.send('Event Management Application API - SGA Group 6');
