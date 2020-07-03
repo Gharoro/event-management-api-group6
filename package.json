@@ -27,12 +27,17 @@
     "cloudinary": "^1.21.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+<<<<<<< HEAD
     "express-validator": "^6.5.0",
     "jsonschema": "^1.2.6",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "multer-storage-cloudinary": "^4.0.0",
+=======
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+>>>>>>> fd11bc823f929436d318ee48b122a329aa8b0758
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.0.2",
