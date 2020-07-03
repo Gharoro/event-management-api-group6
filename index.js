@@ -20,7 +20,7 @@ app.use(morgan('tiny'));
 
 // Passport
 app.use(passport.initialize());
-customerPassport(passport);
+passportConfig(passport);
 
 
 // Connecting to database
