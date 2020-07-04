@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-// All methods related to authentication and authorization should be here.
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {
@@ -135,17 +133,13 @@ const signIn = async (req, res, next) => {
     }
     // extracting relevant information from user database
     const manager_password = managerExist[0].dataValues.password;
-    const manager_businessname = managerExist[0].dataValues.businessName;
-    const manager_logo = managerExist[0].dataValues.logo;
     const manager_id = managerExist[0].dataValues.id;
 
     const passwordMatch = await bcrypt.compare(password, manager_password); // returns true or false
     if (passwordMatch) {
       // defining the contents of the payload
       const payload = {
-        id: manager_id,
-        businessName: manager_businessname,
-        logo: manager_logo,
+        id: manager_id
       };
       // signing the token
       jwt.sign(payload, process.env.secretOrkey, {
@@ -161,13 +155,14 @@ const signIn = async (req, res, next) => {
     } else {
       return res.status(400).json({
         status: 400,
-        message: 'Incorrect Password!',
+        message: 'Incorrect Credentials',
       });
     }
   } catch (error) {
     return next(error);
   }
 };
+
 export {
   signUp,
   signIn

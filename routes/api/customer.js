@@ -6,7 +6,7 @@ import {
     signup,
     signin,
     customerProfile
-} from "../../controllers/authCustomerController";
+} from "../../controllers/customerController";
 import customerPassportConfig from '../../config/customerPassport';
 
 customerPassportConfig(passport);
