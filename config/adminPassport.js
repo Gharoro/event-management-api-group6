@@ -9,14 +9,13 @@ const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.secretOrKey;
 
-const customerPassportConfig = passport => {
+const passportConfig = passport => {
   passport.use(
     new Strategy(opts, (jwtPayload, done) => {
-      models.customers
-        .findByPk(jwtPayload.id)
-        .then(customer => {
-          if (customer) {
-            return done(null, customer);
+      models.Managers.findByPk(jwtPayload.id)
+        .then(manager => {
+          if (manager) {
+            return done(null, manager);
           }
           return done(null, false);
         })
@@ -25,4 +24,4 @@ const customerPassportConfig = passport => {
   );
 };
 
-export default customerPassportConfig;
+export default passportConfig;
