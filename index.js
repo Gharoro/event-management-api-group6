@@ -1,14 +1,11 @@
 import express from 'express';
 import morgan from 'morgan';
-import passport from 'passport';
 
 import auth from './routes/api/authAdmin';
 import customer from './routes/api/customer';
 import center from './routes/api/center';
 import connect from './config/dbconnection';
 
-import customerPassportConfig from './config/customerPassport';
-import passportConfig from './config/adminPassport';
 
 // App initalization
 const app = express();
@@ -23,16 +20,9 @@ app.use(express.urlencoded({
 }))
 app.use(morgan('tiny'));
 
-// Passport
-// app.use(passport.initialize());
-
 // Routes
-// passportConfig(passport);
 app.use('/api/auth', auth);
-
 app.use('/api/center', center);
-
-// customerPassportConfig(passport);
 app.use('/api/auth/customer', customer)
 
 
