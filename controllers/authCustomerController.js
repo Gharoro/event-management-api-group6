@@ -145,7 +145,7 @@ const signin = async (req, res, next) => {
       };
 
       // sign token with the details
-      jwt.sign(payload, process.env.SECRET_PASSPORT_KEY, {expiresIn: 10800000}, ((error, token)=>{
+      jwt.sign(payload, process.env.secretOrkey, {expiresIn: 10800000}, ((error, token)=>{
         if(error) throw error;
 
         return res.status(200).json({
