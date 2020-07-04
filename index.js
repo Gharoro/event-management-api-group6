@@ -24,15 +24,15 @@ app.use(express.urlencoded({
 app.use(morgan('tiny'));
 
 // Passport
-app.use(passport.initialize());
+// app.use(passport.initialize());
 
 // Routes
-passportConfig(passport);
+// passportConfig(passport);
 app.use('/api/auth', auth);
 
 app.use('/api/center', center);
 
-customerPassportConfig(passport);
+// customerPassportConfig(passport);
 app.use('/api/auth/customer', customer)
 
 

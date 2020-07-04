@@ -134,12 +134,14 @@ const signIn = async (req, res, next) => {
     // extracting relevant information from user database
     const manager_password = managerExist[0].dataValues.password;
     const manager_id = managerExist[0].dataValues.id;
+    const manager_role = managerExist[0].dataValues.role;
 
     const passwordMatch = await bcrypt.compare(password, manager_password); // returns true or false
     if (passwordMatch) {
       // defining the contents of the payload
       const payload = {
-        id: manager_id
+        id: manager_id,
+        role: manager_role
       };
       // signing the token
       jwt.sign(payload, process.env.secretOrkey, {
