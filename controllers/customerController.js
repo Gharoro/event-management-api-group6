@@ -133,13 +133,15 @@ const signin = async (req, res, next) => {
 
     // if user exists extract relevant values from the customer
     const id = customer.dataValues.id;
+    const role = customer.dataValues.role;
     const customer_password = customer.dataValues.password;
     // check if the password the user supplied is the same as the one in the db
     const password_match = await bcrypt.compare(password, customer_password);
 
     if (password_match) {
       const payload = {
-        id
+        id,
+        role
       };
 
       // sign token with the details

@@ -2,23 +2,21 @@ import {
     Router
 } from 'express';
 
-import passport from 'passport';
-
 import {
     signUp,
-    signIn
+    signIn,
+    adminProfile
 } from '../../controllers/authAdminController';
+import {
+    adminProtect
+} from '../../middleware/auth';
 import parser from '../../config/cloudinaryConfig';
-import passportConfig from '../../config/adminPassport';
-
 
 const router = Router();
 
-passportConfig(passport);
-
-router.post('/signup', parser.single('logo'), signUp);
-
-router.post('/signin', signIn);
+router.post('/admin/signup', parser.single('logo'), signUp);
+router.post('/admin/signin', signIn);
+router.get('/admin/profile', adminProtect, adminProfile);
 
 
 export default router;

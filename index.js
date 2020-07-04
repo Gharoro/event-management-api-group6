@@ -1,11 +1,11 @@
 import express from 'express';
 import morgan from 'morgan';
-import passport from 'passport';
 
 import auth from './routes/api/authAdmin';
 import customer from './routes/api/customer';
 import center from './routes/api/center';
 import connect from './config/dbconnection';
+
 
 // App initalization
 const app = express();
@@ -19,9 +19,6 @@ app.use(express.urlencoded({
   extended: true
 }))
 app.use(morgan('tiny'));
-
-// Passport
-app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', auth);
