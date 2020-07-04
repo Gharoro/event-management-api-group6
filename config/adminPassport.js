@@ -16,7 +16,7 @@ opts.secretOrKey = process.env.secretOrKey;
 
 const passportConfig = (passport) => {
   passport.use(new Strategy(opts, (jwtPayload, done) => {
-    models.Managers.findByPk(jwtPayload.id)
+    models.Manager.findByPk(jwtPayload.id)
       .then((manager) => {
         if (manager) {
           return done(null, manager);

@@ -7,9 +7,6 @@ import {
     signin,
     customerProfile
 } from "../../controllers/customerController";
-import customerPassportConfig from '../../config/customerPassport';
-
-customerPassportConfig(passport);
 
 const router = Router();
 

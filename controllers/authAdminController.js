@@ -163,7 +163,30 @@ const signIn = async (req, res, next) => {
   }
 };
 
+const adminProfile = async (req, res, next) => {
+  res.json({
+    admin: req.user
+  });
+  // return res.json({
+  //   success: true,
+  //   message: 'Welcome Admin',
+  //   profile: {
+  //     id: req.user.id,
+  //     firstname: req.user.firstName,
+  //     lastname: req.user.lastName,
+  //     email: req.user.email,
+  //     phone_number: req.user.phoneNum,
+  //     role: req.user.role,
+  //     business_name: req.user.businessName,
+  //     address: req.user.address,
+  //     logo: req.user.logo,
+  //     register_date: req.user.createdAt,
+  //   }
+  // });
+}
+
 export {
   signUp,
-  signIn
+  signIn,
+  adminProfile
 };
