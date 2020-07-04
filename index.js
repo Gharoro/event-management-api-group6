@@ -2,10 +2,8 @@ import express from 'express';
 import morgan from 'morgan';
 import auth from './routes/api/auth';
 import center from './routes/api/center';
-import passportConfig from './config/passport';
-import customerProfile from './routes/api/customerProfile'
 import connect from './config/dbconnection';
-import custormer from './routes/api/authCustomer';
+import customer from './routes/api/authCustomer';
 import passport from 'passport';
 
 
@@ -14,13 +12,15 @@ const app = express();
 
 // middlewares
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({
+  extended: true
+}))
 app.use(morgan('tiny'));
 
 
 // Passport
 app.use(passport.initialize());
-passportConfig(passport);
+
 
 
 // Connecting to database
@@ -31,7 +31,7 @@ connect();
 // Routes
 app.use('/api/auth', auth);
 app.use('/api/center', center);
-app.use('/auth/customer', custormer)
+app.use('/api/auth/customer', customer)
 
 
 app.get('/', (req, res) => {

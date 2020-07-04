@@ -2,7 +2,9 @@
 // All methods related to authentication and authorization should be here.
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { config } from 'dotenv';
+import {
+  config
+} from 'dotenv';
 import models from '../models';
 
 config();
@@ -68,7 +70,9 @@ const signUp = async (req, res, next) => {
   }
   try {
     const checkMangers = await models.Manager.findAll({
-      where: { email },
+      where: {
+        email
+      },
     });
     if ((checkMangers.length > 0)) {
       return res.status(400).json({
@@ -92,8 +96,7 @@ const signUp = async (req, res, next) => {
       // return a success message on completion
       return res.json({
         status: 200,
-        message: 'User has been created successfully',
-        user: managers,
+        message: 'Account created successfully',
       });
     }
     // return an error message on failure
@@ -107,7 +110,10 @@ const signUp = async (req, res, next) => {
 };
 
 const signIn = async (req, res, next) => {
-  const { email, password } = req.body;
+  const {
+    email,
+    password
+  } = req.body;
   // check if user inputs email or password
   if (!email || !password) {
     return res.status(400).json({
@@ -116,7 +122,11 @@ const signIn = async (req, res, next) => {
     });
   }
   try {
-    const managerExist = await models.Manager.findAll({ where: { email } }); // check if user exist
+    const managerExist = await models.Manager.findAll({
+      where: {
+        email
+      }
+    }); // check if user exist
     if (managerExist.length < 1) {
       return res.status(404).json({
         status: 404,
@@ -138,7 +148,9 @@ const signIn = async (req, res, next) => {
         logo: manager_logo,
       };
       // signing the token
-      jwt.sign(payload, process.env.secretOrkey, { expiresIn: 10800000 }, (err, token) => {
+      jwt.sign(payload, process.env.secretOrkey, {
+        expiresIn: 10800000
+      }, (err, token) => {
         if (err) throw err;
         return res.status(200).json({
           status: 200,
@@ -156,4 +168,7 @@ const signIn = async (req, res, next) => {
     return next(error);
   }
 };
-export { signUp, signIn };
+export {
+  signUp,
+  signIn
+};

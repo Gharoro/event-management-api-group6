@@ -2,7 +2,9 @@
 import models from "../models";
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
-import {config} from 'dotenv';
+import {
+  config
+} from 'dotenv';
 
 config();
 
@@ -64,7 +66,9 @@ const signup = async (req, res, next) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const checkExist = await models.customers.findOne({
-      where: { email }
+      where: {
+        email
+      }
     });
     //  throw an error if the user alreaddy exist
     if (checkExist) {
@@ -88,8 +92,7 @@ const signup = async (req, res, next) => {
     if (customer) {
       return res.status(200).json({
         status: 200,
-        message: "Your account has been successfully created",
-        user: customer
+        message: "Your account has been successfully created"
       });
     }
     return res.status(500).json({
@@ -102,7 +105,10 @@ const signup = async (req, res, next) => {
 };
 
 const signin = async (req, res, next) => {
-  const { email, password } = req.body;
+  const {
+    email,
+    password
+  } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
@@ -112,7 +118,11 @@ const signin = async (req, res, next) => {
   }
 
   try {
-    const customer = await models.customers.findOne({ where: { email } });
+    const customer = await models.customers.findOne({
+      where: {
+        email
+      }
+    });
 
     if (!customer) {
       res.status(400).json({
@@ -120,33 +130,23 @@ const signin = async (req, res, next) => {
         message: "User does not Exist please check details supplied"
       });
     }
-    
+
     // if user exists extract relevant values from the customer
     const id = customer.dataValues.id;
     const customer_password = customer.dataValues.password;
-    const firstname = customer.dataValues.firstname;
-    const lastname = customer.dataValues.lastname;
-    const customer_email = customer.dataValues.email;
-    const phone_number = customer.dataValues.phone_number;
-    const gender = customer.dataValues.gender;
-    const role = customer.dataValues.role;
-// check if the password the user supplied is the same as the one in the db
+    // check if the password the user supplied is the same as the one in the db
     const password_match = await bcrypt.compare(password, customer_password);
 
     if (password_match) {
       const payload = {
-        id,
-        firstname,
-        lastname,
-        customer_email,
-        phone_number,
-        gender,
-        role
+        id
       };
 
       // sign token with the details
-      jwt.sign(payload, process.env.secretOrkey, {expiresIn: 10800000}, ((error, token)=>{
-        if(error) throw error;
+      jwt.sign(payload, process.env.secretOrkey, {
+        expiresIn: 10800000
+      }, ((error, token) => {
+        if (error) throw error;
 
         return res.status(200).json({
           status: 200,
@@ -154,15 +154,36 @@ const signin = async (req, res, next) => {
           token: `Bearer ${token}`
         })
       }))
-    }else 
-    return res.status(400).json({
-      status: 400,
-      message: 'Incorrect Password'
-    })
+    } else
+      return res.status(400).json({
+        status: 400,
+        message: 'Incorrect Password'
+      })
   } catch (error) {
     console.log(error);
     return next(error);
   }
 };
 
-export { signup, signin };
+const customerProfile = async (req, res, next) => {
+  res.json({
+    success: true,
+    message: 'Welcome',
+    profile: {
+      id: req.user.id,
+      firstname: req.user.firstname,
+      lastname: req.user.lastname,
+      email: req.user.email,
+      phone_number: req.user.phone,
+      role: req.user.role,
+      gender: req.user.gender,
+      register_date: req.user.createdAt,
+    }
+  });
+}
+
+export {
+  signup,
+  signin,
+  customerProfile
+};

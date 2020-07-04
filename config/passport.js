@@ -1,5 +1,10 @@
-import { Strategy, ExtractJwt } from 'passport-jwt';
-import { config } from 'dotenv';
+import {
+  Strategy,
+  ExtractJwt
+} from 'passport-jwt';
+import {
+  config
+} from 'dotenv';
 
 import models from '../models/index';
 
@@ -11,7 +16,7 @@ opts.secretOrKey = process.env.secretOrKey;
 
 const passportConfig = (passport) => {
   passport.use(new Strategy(opts, (jwtPayload, done) => {
-    models.Manager.findByPk(jwtPayload.id)
+    models.Managers.findByPk(jwtPayload.id)
       .then((manager) => {
         if (manager) {
           return done(null, manager);
