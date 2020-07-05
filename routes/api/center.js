@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { addCenter} from "../../controllers/centersController";
+import { addCenter, viewOneCenter, viewAllCenters} from "../../controllers/centersController";
 import { adminProtect } from "../../middleware/auth";
 import parser from "../../config/cloudinaryConfig";
 
@@ -8,5 +8,7 @@ const router = Router();
 
 
 router.post("/add_center", adminProtect, parser.single("image"), addCenter);
+router.get("/view_all_centers", viewAllCenters);
+router.get("/view_one_center/:id", viewOneCenter);
 
 export default router;
