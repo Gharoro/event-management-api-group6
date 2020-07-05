@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const models = require('../models/index');
 
 // Protect routes
-exports.adminProtect = async (req, res, next) => {
+export const adminProtect = async (req, res, next) => {
     let token;
     if (
         req.headers.authorization &&
@@ -42,7 +42,7 @@ exports.adminProtect = async (req, res, next) => {
     }
 };
 
-exports.customerProtect = async (req, res, next) => {
+export const customerProtect = async (req, res, next) => {
     let token;
     if (
         req.headers.authorization &&
