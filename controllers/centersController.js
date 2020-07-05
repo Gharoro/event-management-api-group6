@@ -1,4 +1,3 @@
-// All methods related to centers should be here.
 import models from '../models/index';
 
 const addCenter = async (req, res, next) => {
@@ -9,7 +8,14 @@ const addCenter = async (req, res, next) => {
     });
   }
 
-  const { name, description, capacity, facilities, location, price } = req.body;
+  const {
+    name,
+    description,
+    capacity,
+    facilities,
+    location,
+    price
+  } = req.body;
   const manager_id = req.user.id;
   const image = req.file;
   const allowedTypes = ['image/png', 'image/jpeg'];
@@ -61,4 +67,6 @@ const addCenter = async (req, res, next) => {
   }
 };
 
-export { addCenter };
+export {
+  addCenter
+};

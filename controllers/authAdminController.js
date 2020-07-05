@@ -134,12 +134,14 @@ const signIn = async (req, res, next) => {
     // extracting relevant information from user database
     const manager_password = managerExist[0].dataValues.password;
     const manager_id = managerExist[0].dataValues.id;
+    const manager_role = managerExist[0].dataValues.role;
 
     const passwordMatch = await bcrypt.compare(password, manager_password); // returns true or false
     if (passwordMatch) {
       // defining the contents of the payload
       const payload = {
-        id: manager_id
+        id: manager_id,
+        role: manager_role
       };
       // signing the token
       jwt.sign(payload, process.env.secretOrkey, {
@@ -163,7 +165,30 @@ const signIn = async (req, res, next) => {
   }
 };
 
+const adminProfile = async (req, res, next) => {
+  res.json({
+    admin: req.user
+  });
+  // return res.json({
+  //   success: true,
+  //   message: 'Welcome Admin',
+  //   profile: {
+  //     id: req.user.id,
+  //     firstname: req.user.firstName,
+  //     lastname: req.user.lastName,
+  //     email: req.user.email,
+  //     phone_number: req.user.phoneNum,
+  //     role: req.user.role,
+  //     business_name: req.user.businessName,
+  //     address: req.user.address,
+  //     logo: req.user.logo,
+  //     register_date: req.user.createdAt,
+  //   }
+  // });
+}
+
 export {
   signUp,
-  signIn
+  signIn,
+  adminProfile
 };
