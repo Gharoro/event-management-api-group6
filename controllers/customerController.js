@@ -184,8 +184,11 @@ const customerProfile = async (req, res, next) => {
   });
 }
 
+
+
 export {
   signup,
   signin,
-  customerProfile
+  customerProfile,
+  
 };

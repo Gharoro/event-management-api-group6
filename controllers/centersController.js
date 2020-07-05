@@ -1,41 +1,41 @@
-import models from '../models/index';
+import models from "../models/index";
 
 const addCenter = async (req, res, next) => {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== "admin") {
     return res.status(403).json({
       status: 403,
-      message: 'You are not allowed to access this resource',
+      message: "You are not allowed to access this resource"
     });
   }
 
-  const {
-    name,
-    description,
-    capacity,
-    facilities,
-    location,
-    price
-  } = req.body;
+  const { name, description, capacity, facilities, location, price } = req.body;
   const manager_id = req.user.id;
   const image = req.file;
-  const allowedTypes = ['image/png', 'image/jpeg'];
+  const allowedTypes = ["image/png", "image/jpeg"];
   // Validations
-  if (!name || !description || !capacity || !facilities || !location || !price) {
+  if (
+    !name ||
+    !description ||
+    !capacity ||
+    !facilities ||
+    !location ||
+    !price
+  ) {
     return res.status(400).json({
       status: 400,
-      message: 'Please fill all fields',
+      message: "Please fill all fields"
     });
   }
   if (image === undefined) {
     return res.status(400).json({
       status: 400,
-      message: 'Please upload a picture of your event center',
+      message: "Please upload a picture of your event center"
     });
   }
   if (allowedTypes.indexOf(image.mimetype) === -1) {
     return res.status(400).json({
       status: 400,
-      message: 'Please upload a jpg, jpeg or png file',
+      message: "Please upload a jpg, jpeg or png file"
     });
   }
   try {
@@ -47,26 +47,51 @@ const addCenter = async (req, res, next) => {
       facilities,
       location,
       price,
-      images: image.path,
+      images: image.path
     });
     if (createCenter) {
       // return a success message on completion
       return res.json({
         status: 200,
-        message: 'Center created successfully',
-        center: createCenter,
+        message: "Center created successfully",
+        center: createCenter
       });
     }
     // return an error message on failure
     return res.status(500).json({
       status: 500,
-      message: 'Unable to create center at the moment',
+      message: "Unable to create center at the moment"
     });
   } catch (error) {
     return next(error);
   }
 };
 
-export {
-  addCenter
+const viewAllCenters = async (req, res, next) => {
+  try {
+    const centers = await models.Centers.findAll();
+    return res.status(200).json({
+      status: 200,
+      centers
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
 };
+
+const viewOneCenter = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const center = await models.Centers.findByPk(id);
+    return res.status(200).json({
+      status: 200,
+      center
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+
+export { addCenter, viewAllCenters, viewOneCenter };
