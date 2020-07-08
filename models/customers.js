@@ -9,8 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     role: DataTypes.STRING,
     gender: DataTypes.STRING
   }, {});
-  customers.associate = function(models) {
+  customers.associate = function (models) {
     // associations can be defined here
+    customers.hasMany(models.bookings, {
+      foreignKey: 'id'
+    });
   };
   return customers;
 };
