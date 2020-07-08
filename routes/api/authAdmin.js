@@ -5,7 +5,8 @@ import {
 import {
     signUp,
     signIn,
-    adminProfile
+    adminProfile,
+    editProfile
 } from '../../controllers/authAdminController';
 import {
     adminProtect
@@ -17,6 +18,7 @@ const router = Router();
 router.post('/admin/signup', parser.single('logo'), signUp);
 router.post('/admin/signin', signIn);
 router.get('/admin/profile', adminProtect, adminProfile);
+router.put('/admin/profile/edit', adminProtect, parser.single('logo'), editProfile);
 
 
 export default router;

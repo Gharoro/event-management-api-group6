@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import {
   config
 } from 'dotenv';
-import models from '../models';
+import models from '../models/index';
 
 config();
 
@@ -166,29 +166,109 @@ const signIn = async (req, res, next) => {
 };
 
 const adminProfile = async (req, res, next) => {
-  res.json({
-    admin: req.user
+  return res.json({
+    success: true,
+    message: 'Welcome Admin',
+    admin: {
+      id: req.user.id,
+      firstname: req.user.firstName,
+      lastname: req.user.lastName,
+      email: req.user.email,
+      phone_number: req.user.phoneNum,
+      role: req.user.role,
+      business_name: req.user.businessName,
+      address: req.user.address,
+      logo: req.user.logo,
+      register_date: req.user.createdAt,
+    }
   });
-  // return res.json({
-  //   success: true,
-  //   message: 'Welcome Admin',
-  //   profile: {
-  //     id: req.user.id,
-  //     firstname: req.user.firstName,
-  //     lastname: req.user.lastName,
-  //     email: req.user.email,
-  //     phone_number: req.user.phoneNum,
-  //     role: req.user.role,
-  //     business_name: req.user.businessName,
-  //     address: req.user.address,
-  //     logo: req.user.logo,
-  //     register_date: req.user.createdAt,
-  //   }
-  // });
 }
+
+const editProfile = async (req, res, next) => {
+  let {
+    firstName,
+    lastName,
+    address,
+    businessName,
+    phoneNum,
+  } = req.body;
+  const logo = req.file;
+
+  // retaining old values
+  firstName = (firstName === undefined || firstName === '') ? req.user.dataValues.firstName : firstName;
+  lastName = (lastName === undefined || lastName === '') ? req.user.dataValues.lastName : lastName;
+  address = (address === undefined || address === '') ? req.user.dataValues.address : address;
+  businessName = (businessName === undefined || businessName === '') ? req.user.dataValues.businessName : businessName;
+  phoneNum = (phoneNum === undefined || phoneNum === '') ? req.user.dataValues.phoneNum : phoneNum;
+
+  if (logo === undefined) {
+    // update admin without uploading new logo
+    const updateAdmin = await models.Manager.update({
+      firstName,
+      lastName,
+      address,
+      businessName,
+      phoneNum,
+      logo: req.user.dataValues.logo
+    }, {
+      where: {
+        id: req.user.id
+      }
+    });
+    if (updateAdmin.length > 0) {
+      return res.status(200).json({
+        status: 200,
+        message: 'Profile updated successfully'
+      });
+    }
+    return res.status(500).json({
+      status: 500,
+      error: 'An error occured'
+    });
+
+  }
+  // update admin with new logo
+  const allowedTypes = ['image/png', 'image/jpeg'];
+  if (logo.size > 2000000) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Logo must be less than 2mb',
+    });
+  }
+  if (allowedTypes.indexOf(logo.mimetype) === -1) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Please upload a jpg, jpeg or png file',
+    });
+  }
+
+  const updateAdmin = await models.Manager.update({
+    firstName,
+    lastName,
+    address,
+    businessName,
+    phoneNum,
+    logo: logo.path
+  }, {
+    where: {
+      id: req.user.id
+    }
+  });
+  if (updateAdmin.length > 0) {
+    return res.status(200).json({
+      status: 200,
+      message: 'Profile updated successfully'
+    });
+  }
+  return res.status(500).json({
+    status: 500,
+    error: 'An error occured'
+  });
+};
 
 export {
   signUp,
   signIn,
-  adminProfile
+  adminProfile,
+  editProfile
 };
