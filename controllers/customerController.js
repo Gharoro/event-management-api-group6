@@ -29,6 +29,7 @@ const signup = async (req, res, next) => {
     !phone_number ||
     !gender
   ) {
+    
     return res.status(400).json({
       status: 400,
       message: "All fields are required"

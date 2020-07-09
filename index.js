@@ -23,10 +23,10 @@ app.use(
 app.use(morgan("tiny"));
 
 // Routes
-app.use("/api/auth", auth);
+app.use("/api/auth/admin", auth);
 app.use("/api/center", center);
 app.use("/api/auth/customer", customer);
-app.use("/api/auth/booking", booking);
+app.use("/api/auth", booking);
 
 app.get("/", (req, res) => {
   res.send("Event Management Application API - SGA Group 6");

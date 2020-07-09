@@ -1,8 +1,9 @@
-import {Router} from 'express';
+import { Router } from "express";
 const router = Router();
 
-import {makeBooking} from '../../controllers/authBookings';
+import { makeBooking } from "../../controllers/authBookingController";
+import {customerProtect} from "../../middleware/auth";
 
-router.get('/', makeBooking)
+router.post("/:centerId/booking", customerProtect, makeBooking);
 
 export default router;
