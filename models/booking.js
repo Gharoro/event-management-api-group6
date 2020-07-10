@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
   booking.associate = function (models) {
     // associations can be defined here
     booking.belongsTo(models.Centers, {
-      foreignKey: 'center_id'
+      foreignKey: 'centerId'
     });
 
     booking.belongsTo(models.customers, {

@@ -4,7 +4,7 @@ import morgan from "morgan";
 import auth from "./routes/api/authAdmin";
 import customer from "./routes/api/customer";
 import center from "./routes/api/center";
-import booking from "./routes/api/authBooking";
+import booking from "./routes/api/booking";
 import connect from "./config/dbconnection";
 
 // App initalization
@@ -26,7 +26,7 @@ app.use(morgan("tiny"));
 app.use("/api/auth/admin", auth);
 app.use("/api/center", center);
 app.use("/api/auth/customer", customer);
-app.use("/api/auth", booking);
+app.use("/api/booking", booking);
 
 app.get("/", (req, res) => {
   res.send("Event Management Application API - SGA Group 6");

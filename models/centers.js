@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    dates_unavailable: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: []
+    },
     capacity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -41,7 +45,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Center.associate = function (models) {
     // associations can be defined here
-    Center.belongsTo(models.Manager, { foreignKey: 'manager_id' });
+    Center.belongsTo(models.Manager, {
+      foreignKey: 'manager_id'
+    });
   };
   return Center;
 };
