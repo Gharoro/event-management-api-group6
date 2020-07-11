@@ -118,11 +118,13 @@ const searchCenter = async (req, res, next) => {
   // date && location
   // date && capacity
   // location && capacity
+  // Date, location && capacity
   let {
     date,
     location,
     capacity
   } = req.query;
+
   if (!date && !location && !capacity) {
     return res.status(400).json({
       status: 400,
@@ -290,9 +292,46 @@ const searchCenter = async (req, res, next) => {
   }
 }
 
+const newSearch = async (req, res, next) => {
+  // let {
+  //   date,
+  //   location,
+  //   capacity
+  // } = req.query;
+  // // if (!date && !location && !capacity) {
+  // //   return res.status(400).json({
+  // //     status: 400,
+  // //     error: 'Please enter date, location or capacity of event center'
+  // //   });
+  // // }
+  // let x = [];
+  // const result = await models.Centers.findAll();
+  // // console.log(result[0].dataValues.dates_unavailable);
+  // for (let i = 0; i < result.length; i++) {
+  //   // only date
+  //   if (result[i].dataValues.dates_unavailable.indexOf(date) === -1) {
+  //     x.push(result[i]);
+  //   }
+
+  //   if (result[i].dataValues.dates_unavailable.indexOf(date) === -1 && result[i].dataValues.location === location) {
+  //     x.push(result[i]);
+  //   }
+
+  //   if (result[i].dataValues.location === location) {
+  //     x.push(result[i]);
+  //   }
+  // }
+
+  // return res.json({
+  //   result: x
+  // })
+}
+
+
 export {
   addCenter,
   viewAllCenters,
   viewOneCenter,
-  searchCenter
+  searchCenter,
+  newSearch
 };

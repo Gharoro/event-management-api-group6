@@ -6,7 +6,8 @@ import {
     addCenter,
     viewOneCenter,
     viewAllCenters,
-    searchCenter
+    searchCenter,
+    newSearch
 } from "../../controllers/centersController";
 import {
     adminProtect
