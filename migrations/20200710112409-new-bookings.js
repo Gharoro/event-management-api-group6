@@ -13,15 +13,15 @@ module.exports = {
         defaultValue: "Pending"
       },
       event_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
         allowNull: false
       },
-      from: {
-        type: Sequelize.DATE,
+      from_time: {
+        type: Sequelize.STRING,
         allowNull: false
       },
-      to: {
-        type: Sequelize.DATE,
+      to_time: {
+        type: Sequelize.STRING,
         allowNull: false
       },
       purpose: {
@@ -46,6 +46,9 @@ module.exports = {
       balance: {
         type: Sequelize.DECIMAL,
         defaultValue: 0.00
+      },
+      payment_proof: {
+        type: Sequelize.STRING,
       },
       centerId: {
         type: Sequelize.INTEGER,

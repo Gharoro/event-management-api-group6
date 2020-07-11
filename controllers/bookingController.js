@@ -4,13 +4,13 @@ import models from "../models";
 const makeBooking = async (req, res, next) => {
   const {
     event_date,
-    from,
-    to,
+    from_time,
+    to_time,
     purpose,
     additional_info
   } = req.body;
 
-  if (!event_date || !from || !to || !purpose) {
+  if (!event_date || !from_time || !to_time || !purpose) {
     return res.status(400).json({
       status: 400,
       error: "all required fileds must be filled before booking an event"
@@ -47,8 +47,8 @@ const makeBooking = async (req, res, next) => {
 
     const booking = await models.booking.create({
       event_date,
-      from,
-      to,
+      from_time,
+      to_time,
       purpose,
       customerId,
       additional_info,
@@ -83,12 +83,12 @@ const cancelBooking = async (req, res, next) => {
 
   //confirm if it is the same customer that made the booking
   try {
-
     const booking = await models.booking.findOne({
       where: {
         id: bookingId
       }
     });
+
     if (!booking) {
       return res.status(404).json({
         status: 404,
@@ -96,13 +96,7 @@ const cancelBooking = async (req, res, next) => {
       });
     }
 
-    const checkCustomer = await models.booking.findOne({
-      where: {
-        customerId
-      }
-    });
-
-    if (!checkCustomer) {
+    if (booking.dataValues.customerId !== customerId) {
       return res.status(403).json({
         status: 403,
         error: "Sorry you cannot cancel this booking"

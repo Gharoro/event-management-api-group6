@@ -1,4 +1,7 @@
 import models from "../models/index";
+import {
+  Op
+} from "sequelize";
 
 const addCenter = async (req, res, next) => {
   if (req.user.role !== "admin") {
@@ -8,7 +11,14 @@ const addCenter = async (req, res, next) => {
     });
   }
 
-  const { name, description, capacity, facilities, location, price } = req.body;
+  const {
+    name,
+    description,
+    capacity,
+    facilities,
+    location,
+    price
+  } = req.body;
   const manager_id = req.user.id;
   const image = req.file;
   const allowedTypes = ["image/png", "image/jpeg"];
@@ -84,6 +94,13 @@ const viewOneCenter = async (req, res, next) => {
   try {
     const id = req.params.id;
     const center = await models.Centers.findByPk(id);
+    if (!center) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Center does not exist'
+      });
+    }
+
     return res.status(200).json({
       status: 200,
       center
@@ -94,4 +111,188 @@ const viewOneCenter = async (req, res, next) => {
   }
 };
 
-export { addCenter, viewAllCenters, viewOneCenter };
+const searchCenter = async (req, res, next) => {
+  // only date
+  // only location
+  // only capacity
+  // date && location
+  // date && capacity
+  // location && capacity
+  let {
+    date,
+    location,
+    capacity
+  } = req.query;
+  if (!date && !location && !capacity) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Please enter date, location or capacity of event center'
+    });
+  }
+
+  try {
+    // search by DATE only
+    if (date && !location && !capacity) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          dates_unavailable: {
+            [Op.contained]: [date],
+          },
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+    // search by LOCATION only
+    if (location && !date && !capacity) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          location: location
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+    // search by CAPACITY only
+    if (capacity && !location && !date) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          capacity: capacity
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+    // search by DATE and LOCATION
+    if (date && location && !capacity) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          [Op.and]: [{
+            dates_unavailable: {
+              [Op.contained]: [date],
+            },
+          }, {
+            location: location
+          }],
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+    // search by DATE and CAPACITY
+    if (date && capacity && !location) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          [Op.and]: [{
+              dates_unavailable: {
+                [Op.contained]: [date],
+              },
+            },
+            {
+              capacity: capacity
+            }
+          ],
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+    // search by LOCATION and CAPACITY
+    if (location && capacity && !date) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          [Op.and]: [{
+            location: location
+          }, {
+            capacity: capacity
+          }],
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+    // search by DATE, LOCATION and CAPACITY
+    if (date && location && capacity) {
+      const result = await models.Centers.findAndCountAll({
+        where: {
+          [Op.and]: [{
+            dates_unavailable: {
+              [Op.contained]: [date],
+            },
+          }, {
+            location: location
+          }, {
+            capacity: capacity
+          }],
+        }
+      });
+      if (result.count === 0) {
+        return res.status(404).json({
+          status: 404,
+          error: 'No result found. Please refine your search and try again'
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: result
+      });
+    }
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export {
+  addCenter,
+  viewAllCenters,
+  viewOneCenter,
+  searchCenter
+};

@@ -7,15 +7,15 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "Pending"
       },
       event_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING,
         allowNull: false
       },
-      from: {
-        type: DataTypes.DATE,
+      from_time: {
+        type: DataTypes.STRING,
         allowNull: false
       },
-      to: {
-        type: DataTypes.DATE,
+      to_time: {
+        type: DataTypes.STRING,
         allowNull: false
       },
       purpose: {
@@ -38,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       centerId: {
         type: DataTypes.INTEGER,
         allowNull: false
+      },
+      payment_proof: {
+        type: DataTypes.STRING,
       }
     }, {}
   );
