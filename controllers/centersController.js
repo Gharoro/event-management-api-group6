@@ -1,7 +1,5 @@
 import models from "../models/index";
-import {
-  Op
-} from "sequelize";
+import { Op } from "sequelize";
 
 const addCenter = async (req, res, next) => {
   if (req.user.role !== "admin") {
@@ -11,14 +9,7 @@ const addCenter = async (req, res, next) => {
     });
   }
 
-  const {
-    name,
-    description,
-    capacity,
-    facilities,
-    location,
-    price
-  } = req.body;
+  const { name, description, capacity, facilities, location, price } = req.body;
   const manager_id = req.user.id;
   const image = req.file;
   const allowedTypes = ["image/png", "image/jpeg"];
@@ -97,7 +88,7 @@ const viewOneCenter = async (req, res, next) => {
     if (!center) {
       return res.status(404).json({
         status: 404,
-        error: 'Center does not exist'
+        error: "Center does not exist",
       });
     }
 
@@ -116,7 +107,19 @@ const deleteCenter = async (req, res, next) => {
     const id = req.params.id;
     //find center by id
     const center = await models.Centers.findByPk(id);
-    //delete
+    //if center with the id does not exit return error
+    if (!center) {
+      return res.status(403).json({
+        status: 403,
+        message: `Center with id:${id} does not exist`,
+      });
+    }
+    if (center.manager_id !== req.user.id) {
+      return res.status(403).json({
+        status: 403,
+        message: "You are not allowed to delete this center",
+      });
+    }
     center.destroy();
     return res.status(200).json({
       status: 200,
@@ -178,7 +181,7 @@ const updateCenter = async (req, res, next) => {
         price,
         images: image.path,
       },
-      { where: { id } }//where id = req.params.id
+      { where: { id } } //where id = req.params.id
     );
     if (updatedCenter) {
       // return a success message on completion
@@ -197,4 +200,4 @@ const updateCenter = async (req, res, next) => {
     return next(error);
   }
 };
-export { addCenter, viewAllCenters, viewOneCenter, deleteCenter , updateCenter};
+export { addCenter, viewAllCenters, viewOneCenter, deleteCenter, updateCenter };
