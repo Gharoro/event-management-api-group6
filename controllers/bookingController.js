@@ -140,6 +140,8 @@ const cancelBooking = async (req, res, next) => {
   });
 };
 
+
+
 export {
   makeBooking,
   cancelBooking
