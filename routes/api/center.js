@@ -19,7 +19,7 @@ router.get("/view_all_centers", viewAllCenters);
 router.get("/view_one_center/:id", viewOneCenter);
 router.delete("/delete_center/:id", adminProtect, deleteCenter);
 router.patch(
-  "/upate_center/:id",
+  "/update_center/:id",
   adminProtect,
   parser.single("image"),
   updateCenter
