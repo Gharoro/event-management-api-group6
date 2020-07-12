@@ -41,6 +41,18 @@ module.exports = (sequelize, DataTypes) => {
       },
       payment_proof: {
         type: DataTypes.STRING,
+      },
+      referrence: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      paid_at: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      channel: {
+        type: DataTypes.STRING,
+        allowNull: true
       }
     }, {}
   );
