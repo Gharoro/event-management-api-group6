@@ -1,4 +1,7 @@
 import models from "../models/index";
+import {
+  Op
+} from "sequelize";
 
 const addCenter = async (req, res, next) => {
   if (req.user.role !== "admin") {
@@ -8,7 +11,14 @@ const addCenter = async (req, res, next) => {
     });
   }
 
-  const { name, description, capacity, facilities, location, price } = req.body;
+  const {
+    name,
+    description,
+    capacity,
+    facilities,
+    location,
+    price
+  } = req.body;
   const manager_id = req.user.id;
   const image = req.file;
   const allowedTypes = ["image/png", "image/jpeg"];
@@ -84,6 +94,13 @@ const viewOneCenter = async (req, res, next) => {
   try {
     const id = req.params.id;
     const center = await models.Centers.findByPk(id);
+    if (!center) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Center does not exist'
+      });
+    }
+
     return res.status(200).json({
       status: 200,
       center,

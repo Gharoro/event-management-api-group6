@@ -1,16 +1,23 @@
+import {
+  config
+} from 'dotenv';
+import fetch from 'node-fetch';
+import crypto from 'crypto';
+
 import models from "../models";
 
+config();
 
 const makeBooking = async (req, res, next) => {
   const {
     event_date,
-    from,
-    to,
+    from_time,
+    to_time,
     purpose,
     additional_info
   } = req.body;
 
-  if (!event_date || !from || !to || !purpose) {
+  if (!event_date || !from_time || !to_time || !purpose) {
     return res.status(400).json({
       status: 400,
       error: "all required fileds must be filled before booking an event"
@@ -47,8 +54,8 @@ const makeBooking = async (req, res, next) => {
 
     const booking = await models.booking.create({
       event_date,
-      from,
-      to,
+      from_time,
+      to_time,
       purpose,
       customerId,
       additional_info,
@@ -83,12 +90,12 @@ const cancelBooking = async (req, res, next) => {
 
   //confirm if it is the same customer that made the booking
   try {
-
     const booking = await models.booking.findOne({
       where: {
         id: bookingId
       }
     });
+
     if (!booking) {
       return res.status(404).json({
         status: 404,
@@ -96,13 +103,7 @@ const cancelBooking = async (req, res, next) => {
       });
     }
 
-    const checkCustomer = await models.booking.findOne({
-      where: {
-        customerId
-      }
-    });
-
-    if (!checkCustomer) {
+    if (booking.dataValues.customerId !== customerId) {
       return res.status(403).json({
         status: 403,
         error: "Sorry you cannot cancel this booking"
@@ -146,7 +147,127 @@ const cancelBooking = async (req, res, next) => {
   });
 };
 
+const initializePayment = async (req, res, next) => {
+  const {
+    bookingId
+  } = req.params;
+  const customerEmail = req.user.email;
+
+  const madeBooking = await models.booking.findByPk(bookingId);
+  if (madeBooking.dataValues.status !== 'Pending') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Center already paid for or declined by admin'
+    });
+  }
+  // Find center booking is being made for
+  const center = await models.Centers.findByPk(madeBooking.dataValues.centerId);
+  const centerAmount = center.dataValues.price * 100;
+  // generate reference token
+  const refToken = crypto.randomBytes(5).toString('hex');
+
+  const raw = JSON.stringify({
+    "email": customerEmail,
+    "amount": centerAmount,
+    "reference": refToken,
+  });
+
+  let requestOptions = {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.PAYSTACK_SECRET}`,
+      'Content-Type': 'application/json'
+    },
+    body: raw,
+    redirect: 'follow'
+  };
+
+  try {
+    const payNow = await fetch("https://api.paystack.co/transaction/initialize", requestOptions);
+    const response = await payNow.json();
+    // update booking referrence field
+    await models.booking.update({
+      referrence: response.data.reference
+    }, {
+      where: {
+        id: bookingId
+      }
+    });
+
+    return res.json({
+      response
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+const verifyPayment = async (req, res, next) => {
+  const {
+    bookingId
+  } = req.params;
+
+  const madeBooking = await models.booking.findByPk(bookingId);
+  if (madeBooking.dataValues.status !== 'Pending') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Center already paid for or declined by admin'
+    });
+  }
+
+  if (madeBooking.dataValues.referrence === null) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Payment has not been initialized for this booking'
+    });
+  }
+  const REFERENCE = madeBooking.dataValues.referrence;
+
+  let requestOptions = {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${process.env.PAYSTACK_SECRET}`,
+      'Content-Type': 'application/json'
+    }
+  };
+
+  try {
+    const verify = await fetch(`https://api.paystack.co/transaction/verify/${REFERENCE}`, requestOptions);
+    const response = await verify.json();
+    // if success, change status to Paid, set the amount_paid, set paid_at, set channel,
+    if (response.data.status === 'success') {
+      await models.booking.update({
+        status: 'Paid',
+        amount_paid: response.data.amount,
+        paid_at: response.data.paid_at,
+        channel: response.data.channel
+      }, {
+        where: {
+          id: bookingId
+        }
+      });
+
+      return res.status(200).json({
+        status: 200,
+        message: 'Payment successful',
+        response
+      });
+    }
+
+    return res.status(400).json({
+      status: 400,
+      error: 'Payment verification failed',
+      response
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+}
+
 export {
   makeBooking,
-  cancelBooking
+  cancelBooking,
+  initializePayment,
+  verifyPayment
 };
