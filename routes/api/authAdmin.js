@@ -1,11 +1,15 @@
-import { Router } from "express";
+import {
+  Router
+} from "express";
 
 import {
   signUp,
   signIn,
   adminProfile
 } from "../../controllers/authAdminController";
-import { adminProtect } from "../../middleware/auth";
+import {
+  adminProtect
+} from "../../middleware/auth";
 import parser from "../../config/cloudinaryConfig";
 
 const router = Router();
