@@ -1,5 +1,7 @@
 import models from "../models/index";
-import { Op } from "sequelize";
+import {
+  Op
+} from "sequelize";
 
 const addCenter = async (req, res, next) => {
   if (req.user.role !== "admin") {
@@ -9,7 +11,14 @@ const addCenter = async (req, res, next) => {
     });
   }
 
-  const { name, description, capacity, facilities, location, price } = req.body;
+  const {
+    name,
+    description,
+    capacity,
+    facilities,
+    location,
+    price
+  } = req.body;
   const manager_id = req.user.id;
   const image = req.file;
   const allowedTypes = ["image/png", "image/jpeg"];
@@ -91,7 +100,24 @@ const viewOneCenter = async (req, res, next) => {
         error: "Center does not exist",
       });
     }
-
+    const arr = center.dataValues.dates_unavailable;
+    let j = arr.length;
+    while (j--) {
+      const centDate = new Date(arr[j]);
+      const d = Date.now();
+      const currDate = new Date(d);
+      if (currDate > centDate) {
+        arr.splice(j, 1);
+      }
+    }
+    await models.Centers.update({
+        dates_unavailable: arr
+      }, {
+        where: {
+          id
+        }
+      } //where id = req.params.id
+    );
     return res.status(200).json({
       status: 200,
       center,
@@ -109,15 +135,15 @@ const deleteCenter = async (req, res, next) => {
     const center = await models.Centers.findByPk(id);
     //if center with the id does not exit return error
     if (!center) {
-      return res.status(403).json({
-        status: 403,
-        message: `Center with id:${id} does not exist`,
+      return res.status(404).json({
+        status: 404,
+        error: `Center with id:${id} does not exist`,
       });
     }
     if (center.manager_id !== req.user.id) {
       return res.status(403).json({
         status: 403,
-        message: "You are not allowed to delete this center",
+        error: "You are not allowed to delete this center",
       });
     }
     center.destroy();
@@ -132,37 +158,70 @@ const deleteCenter = async (req, res, next) => {
 };
 
 const updateCenter = async (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({
-      status: 403,
-      message: "You are not allowed to update this resource",
-    });
-  }
   const id = req.params.id;
-  const { name, description, capacity, facilities, location, price } = req.body;
-  const manager_id = req.user.id;
+  let {
+    name,
+    description,
+    capacity,
+    facilities,
+    location,
+    price
+  } = req.body;
   const image = req.file;
   const allowedTypes = ["image/png", "image/jpeg"];
-  // Validations
-  if (
-    !name ||
-    !description ||
-    !capacity ||
-    !facilities ||
-    !location ||
-    !price
-  ) {
-    return res.status(400).json({
-      status: 400,
-      message: "Please fill all fields",
+  // Retrieve the center information
+  const center = await models.Centers.findByPk(id);
+  if (!center) {
+    return res.status(404).json({
+      status: 404,
+      error: `Center with id:${id} does not exist`,
     });
   }
+  // Validations using tenary operators
+  name = (name === undefined || name === '') ? center.dataValues.name : name;
+  description = (description === undefined || description === '') ? center.dataValues.description : description;
+  capacity = (capacity === undefined || capacity === '') ? center.dataValues.capacity : capacity;
+  facilities = (facilities === undefined || facilities === '') ? center.dataValues.facilities : facilities;
+  location = (location === undefined || location === '') ? center.dataValues.location : location;
+  price = (price === undefined || price === '') ? center.dataValues.price : price;
+
+  // if no image was selected, do not update the image url
   if (image === undefined) {
-    return res.status(400).json({
-      status: 400,
-      message: "Please upload a picture of your event center",
-    });
+    try {
+      const updatedCenter = await models.Centers.update({
+          name,
+          description,
+          capacity,
+          facilities,
+          location,
+          price,
+          images: center.dataValues.images,
+        }, {
+          where: {
+            id
+          }
+        } //where id = req.params.id
+      );
+      if (updatedCenter) {
+        // return a success message on completion
+        return res.json({
+          status: 200,
+          message: "Center updated successfully"
+        });
+      }
+      // return an error message on failure
+      return res.status(500).json({
+        status: 500,
+        message: "Unable to update center at the moment",
+      });
+
+    } catch (error) {
+      return next(error);
+    }
+
   }
+
+  // if a new image was selected, update the center image with the new one
   if (allowedTypes.indexOf(image.mimetype) === -1) {
     return res.status(400).json({
       status: 400,
@@ -170,9 +229,7 @@ const updateCenter = async (req, res, next) => {
     });
   }
   try {
-    const updatedCenter = await models.Centers.update(
-      {
-        manager_id,
+    const updatedCenter = await models.Centers.update({
         name,
         description,
         capacity,
@@ -180,15 +237,17 @@ const updateCenter = async (req, res, next) => {
         location,
         price,
         images: image.path,
-      },
-      { where: { id } } //where id = req.params.id
+      }, {
+        where: {
+          id
+        }
+      } //where id = req.params.id
     );
     if (updatedCenter) {
       // return a success message on completion
       return res.json({
         status: 200,
-        message: "Center updated successfully",
-        center: updatedCenter,
+        message: "Center updated successfully"
       });
     }
     // return an error message on failure
@@ -200,4 +259,106 @@ const updateCenter = async (req, res, next) => {
     return next(error);
   }
 };
-export { addCenter, viewAllCenters, viewOneCenter, deleteCenter, updateCenter };
+
+const setUnavailableDates = async (req, res, next) => {
+  const id = req.params.id;
+  const {
+    date
+  } = req.body;
+  if (!date) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Date is required'
+    });
+  }
+  // Retrieve the center information
+  const center = await models.Centers.findByPk(id);
+  if (!center) {
+    return res.status(404).json({
+      status: 404,
+      error: `Center with id:${id} does not exist`,
+    });
+  }
+  let dateArr = center.dataValues.dates_unavailable;
+  try {
+    if (dateArr.indexOf(date) !== -1) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Center already marked for unavailable on this day'
+      });
+    }
+    dateArr.push(date);
+    const dateSet = await center.update({
+      dates_unavailable: dateArr
+    });
+    if (dateSet) {
+      return res.status(200).json({
+        status: 200,
+        message: `Success! Center will no longer be available for booking on ${date}`
+      });
+    }
+    return res.status(500).json({
+      status: 500,
+      error: 'Unable to update center at the moment'
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+const removeDates = async (req, res, next) => {
+  const id = req.params.id;
+  const {
+    date
+  } = req.body;
+  if (!date) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Date is required'
+    });
+  }
+  // Retrieve the center information
+  const center = await models.Centers.findByPk(id);
+  if (!center) {
+    return res.status(404).json({
+      status: 404,
+      error: `Center with id:${id} does not exist`,
+    });
+  }
+  let dateArr = center.dataValues.dates_unavailable;
+  try {
+    const index = dateArr.indexOf(date);
+    if (index === -1) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Center is already available on this day'
+      });
+    }
+    dateArr.splice(index, 1);
+    const dateSet = await center.update({
+      dates_unavailable: dateArr
+    });
+    if (dateSet) {
+      return res.status(200).json({
+        status: 200,
+        message: `Success! Center will now be available for booking on ${date}`
+      });
+    }
+    return res.status(500).json({
+      status: 500,
+      error: 'Unable to update center at the moment'
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export {
+  addCenter,
+  viewAllCenters,
+  viewOneCenter,
+  deleteCenter,
+  updateCenter,
+  setUnavailableDates,
+  removeDates
+};
