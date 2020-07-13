@@ -1,32 +1,22 @@
-import {
-  config
-} from 'dotenv';
-import fetch from 'node-fetch';
-import crypto from 'crypto';
+import { config } from "dotenv";
+import fetch from "node-fetch";
+import crypto from "crypto";
 
 import models from "../models";
 
 config();
 
 const makeBooking = async (req, res, next) => {
-  const {
-    event_date,
-    from_time,
-    to_time,
-    purpose,
-    additional_info
-  } = req.body;
+  const { event_date, from_time, to_time, purpose, additional_info } = req.body;
 
   if (!event_date || !from_time || !to_time || !purpose) {
     return res.status(400).json({
       status: 400,
-      error: "all required fileds must be filled before booking an event"
+      error: "all required fields must be filled before booking an event"
     });
   }
   const customerId = req.user.id;
-  const {
-    centerId
-  } = req.params;
+  const { centerId } = req.params;
 
   try {
     const findCenter = await models.Centers.findOne({
@@ -36,12 +26,10 @@ const makeBooking = async (req, res, next) => {
     });
 
     if (!findCenter) {
-      return res
-        .status(404)
-        .json({
-          status: 404,
-          error: "cannot book an event hall that does not exist"
-        });
+      return res.status(404).json({
+        status: 404,
+        error: "cannot book an event hall that does not exist"
+      });
     }
 
     const dateArr = findCenter.dataValues.dates_unavailable;
@@ -69,7 +57,7 @@ const makeBooking = async (req, res, next) => {
 
       return res.status(200).json({
         status: 200,
-        success: "you have successfully book this Hall"
+        success: "you have successfully booked this Hall"
       });
     }
 
@@ -117,13 +105,16 @@ const cancelBooking = async (req, res, next) => {
     });
     const dateArr = findCenter.dataValues.dates_unavailable;
     // set booking status to cancel
-    const deleteBooking = await models.booking.update({
-      status: "cancelled"
-    }, {
-      where: {
-        id: bookingId
+    const deleteBooking = await models.booking.update(
+      {
+        status: "cancelled"
+      },
+      {
+        where: {
+          id: bookingId
+        }
       }
-    });
+    );
 
     if (deleteBooking) {
       const index = dateArr.indexOf(checkCustomer.event_date);
@@ -148,51 +139,55 @@ const cancelBooking = async (req, res, next) => {
 };
 
 const initializePayment = async (req, res, next) => {
-  const {
-    bookingId
-  } = req.params;
+  const { bookingId } = req.params;
   const customerEmail = req.user.email;
 
   const madeBooking = await models.booking.findByPk(bookingId);
-  if (madeBooking.dataValues.status !== 'Pending') {
+  if (madeBooking.dataValues.status !== "Pending") {
     return res.status(400).json({
       status: 400,
-      error: 'Center already paid for or declined by admin'
+      error: "Center already paid for or declined by admin"
     });
   }
   // Find center booking is being made for
   const center = await models.Centers.findByPk(madeBooking.dataValues.centerId);
   const centerAmount = center.dataValues.price * 100;
   // generate reference token
-  const refToken = crypto.randomBytes(5).toString('hex');
+  const refToken = crypto.randomBytes(5).toString("hex");
 
   const raw = JSON.stringify({
-    "email": customerEmail,
-    "amount": centerAmount,
-    "reference": refToken,
+    email: customerEmail,
+    amount: centerAmount,
+    reference: refToken
   });
 
   let requestOptions = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${process.env.PAYSTACK_SECRET}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
+      "Content-Type": "application/json"
     },
     body: raw,
-    redirect: 'follow'
+    redirect: "follow"
   };
 
   try {
-    const payNow = await fetch("https://api.paystack.co/transaction/initialize", requestOptions);
+    const payNow = await fetch(
+      "https://api.paystack.co/transaction/initialize",
+      requestOptions
+    );
     const response = await payNow.json();
     // update booking referrence field
-    await models.booking.update({
-      referrence: response.data.reference
-    }, {
-      where: {
-        id: bookingId
+    await models.booking.update(
+      {
+        referrence: response.data.reference
+      },
+      {
+        where: {
+          id: bookingId
+        }
       }
-    });
+    );
 
     return res.json({
       response
@@ -200,74 +195,164 @@ const initializePayment = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-}
+};
 
 const verifyPayment = async (req, res, next) => {
-  const {
-    bookingId
-  } = req.params;
+  const { bookingId } = req.params;
 
   const madeBooking = await models.booking.findByPk(bookingId);
-  if (madeBooking.dataValues.status !== 'Pending') {
+  if (madeBooking.dataValues.status !== "Pending") {
     return res.status(400).json({
       status: 400,
-      error: 'Center already paid for or declined by admin'
+      error: "Center already paid for or declined by admin"
     });
   }
 
   if (madeBooking.dataValues.referrence === null) {
     return res.status(400).json({
       status: 400,
-      error: 'Payment has not been initialized for this booking'
+      error: "Payment has not been initialized for this booking"
     });
   }
   const REFERENCE = madeBooking.dataValues.referrence;
 
   let requestOptions = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Authorization': `Bearer ${process.env.PAYSTACK_SECRET}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
+      "Content-Type": "application/json"
     }
   };
 
   try {
-    const verify = await fetch(`https://api.paystack.co/transaction/verify/${REFERENCE}`, requestOptions);
+    const verify = await fetch(
+      `https://api.paystack.co/transaction/verify/${REFERENCE}`,
+      requestOptions
+    );
     const response = await verify.json();
     // if success, change status to Paid, set the amount_paid, set paid_at, set channel,
-    if (response.data.status === 'success') {
-      await models.booking.update({
-        status: 'Paid',
-        amount_paid: response.data.amount,
-        paid_at: response.data.paid_at,
-        channel: response.data.channel
-      }, {
-        where: {
-          id: bookingId
+    if (response.data.status === "success") {
+      await models.booking.update(
+        {
+          status: "Paid",
+          amount_paid: response.data.amount,
+          paid_at: response.data.paid_at,
+          channel: response.data.channel
+        },
+        {
+          where: {
+            id: bookingId
+          }
         }
-      });
+      );
 
       return res.status(200).json({
         status: 200,
-        message: 'Payment successful',
+        message: "Payment successful",
         response
       });
     }
 
     return res.status(400).json({
       status: 400,
-      error: 'Payment verification failed',
+      error: "Payment verification failed",
       response
     });
-
   } catch (error) {
     return next(error);
   }
-}
+};
+
+const customerViewBookings = async (req, res, next) => {
+  const { id } = req.user;
+  const results = await models.booking.findAll({
+    where: { customerId: id }
+  });
+
+  return res.status(200).json({
+    status: 200,
+    message: results
+  });
+};
+
+const pendingBookings = async (req, res, next) => {
+  const { id } = req.user;
+  try {
+    const results = await models.booking.findAll({
+      attributes: [
+        "status",
+        "event_date",
+        "from_time",
+        "to_time",
+        "purpose",
+        "additional_info",
+        "amount_paid",
+        "balance",
+        "paid_at",
+        "channel",
+        ["createdAt", "date of booking"]
+      ],
+      where: { customerId: id, status: "Pending" },
+      include: [{ model: models.Centers, attributes: ['name', 'description', 'capacity', 'facilities', 'location', 'images', 'price'] }]
+    });
+    return res.status(200).json({
+      status: 200,
+      message: results
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+
+const paidBookings = async (req, res, next) => {
+  const { id } = req.user;
+  try {
+    const results = await models.booking.findAll({
+      attributes: [
+        "status",
+        "event_date",
+        "from_time",
+        "to_time",
+        "purpose",
+        "additional_info",
+        "amount_paid",
+        "balance",
+        "paid_at",
+        "channel",
+        ["createdAt", "date of booking"]
+      ],
+      where: { customerId: id, status: "Paid" },
+      include: [{ model: models.Centers, attributes: ['name', 'description', 'capacity', 'facilities', 'location', 'images', 'price'] }]
+    });
+    return res.status(200).json({
+      status: 200,
+      message: results
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+const pastBookings = async (req, res, next) => {
+    try{
+    return res.status(200).json({
+      status: 200,
+      message: "See past bookings here"
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
 
 export {
   makeBooking,
   cancelBooking,
   initializePayment,
-  verifyPayment
+  verifyPayment,
+  customerViewBookings,
+  pendingBookings,
+  paidBookings,
+  pastBookings
 };
