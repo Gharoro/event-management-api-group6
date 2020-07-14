@@ -14,8 +14,8 @@ import parser from "../../config/cloudinaryConfig";
 
 const router = Router();
 
-// router.post("/signup", parser.single("logo"), signUp);
-router.post("/signup", signUp);
+router.post("/signup", parser.single("logo"), signUp);
+
 router.post("/signin", signIn);
 router.get("/profile", adminProtect, adminProfile);
 
