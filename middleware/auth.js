@@ -22,7 +22,7 @@ export const adminProtect = async (req, res, next) => {
 
     try {
         // verify token
-        const decoded = jwt.verify(token, process.env.secretOrkey);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.role === 'admin') {
             req.user = await models.Manager.findByPk(decoded.id)
         } else {
@@ -61,7 +61,7 @@ export const customerProtect = async (req, res, next) => {
 
     try {
         // verify token
-        const decoded = jwt.verify(token, process.env.secretOrkey);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.role === 'user') {
             req.user = await models.customers.findByPk(decoded.id)
         } else {
