@@ -30,7 +30,12 @@ app.use("/api/booking", booking);
 
 app.get("/", (req, res) => {
   // res.send("Welcome to Magnitude Event Manager - SGA Group 6");
-  res.redirect('https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest');
+  res.status(200).json({
+    success: true,
+    message: 'Hello there! Welcome to Magnitude Event Manager.',
+    api_doc: 'View the API Documentation here - https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest'
+  })
+  //res.redirect('https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest');
 });
 
 const port = process.env.PORT || 900;
