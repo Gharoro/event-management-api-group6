@@ -144,7 +144,7 @@ const signIn = async (req, res, next) => {
         role: manager_role
       };
       // signing the token
-      jwt.sign(payload, process.env.secretOrkey, {
+      jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: 10800000
       }, (err, token) => {
         if (err) throw err;
