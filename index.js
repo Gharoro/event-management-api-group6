@@ -29,7 +29,8 @@ app.use("/api/auth/customer", customer);
 app.use("/api/booking", booking);
 
 app.get("/", (req, res) => {
-  res.send("Event Management Application API - SGA Group 6");
+  // res.send("Welcome to Magnitude Event Manager - SGA Group 6");
+  res.redirect('https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest');
 });
 
 const port = process.env.PORT || 900;
