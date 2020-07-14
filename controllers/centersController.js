@@ -80,6 +80,12 @@ const addCenter = async (req, res, next) => {
 const viewAllCenters = async (req, res, next) => {
   try {
     const centers = await models.Centers.findAll();
+    if (centers.length < 1) {
+      return res.status(404).json({
+        status: 404,
+        error: 'There are no centers at the moment',
+      });
+    }
     return res.status(200).json({
       status: 200,
       centers,
