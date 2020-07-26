@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import cors from 'cors';
 
 import auth from "./routes/api/authAdmin";
 import customer from "./routes/api/customer";
@@ -9,6 +10,9 @@ import connect from "./config/dbconnection";
 
 // App initalization
 const app = express();
+
+// Enabling CORS
+app.use(cors());
 
 // Connecting to database
 connect();
