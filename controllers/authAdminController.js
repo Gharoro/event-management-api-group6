@@ -20,27 +20,26 @@ const signUp = async (req, res, next) => {
     phoneNum,
   } = req.body;
 
-  //const logo = req.file;
-  //const allowedTypes = ['image/png', 'image/jpeg'];
-  // if (logo === undefined) {
-  //   return res.status(400).json({
-  //     status: 400,
-  //     message: 'Please upload a logo for your event center',
-  //   });
-  // }
-  // if (logo.size > 2000000) {
-  //   return res.status(400).json({
-  //     status: 400,
-  //     message: 'Logo must be less than 2mb',
-  //   });
-  // }
-  // if (allowedTypes.indexOf(logo.mimetype) === -1) {
-  //   return res.status(400).json({
-  //     status: 400,
-  //     message: 'Please upload a jpg, jpeg or png file',
-  //   });
-  // }
-  console.log(req.body.firstName);
+  const logo = req.file;
+  const allowedTypes = ['image/png', 'image/jpeg'];
+  if (logo === undefined) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Please upload a logo for your event center',
+    });
+  }
+  if (logo.size > 2000000) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Logo must be less than 2mb',
+    });
+  }
+  if (allowedTypes.indexOf(logo.mimetype) === -1) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Please upload a jpg, jpeg or png file',
+    });
+  }
   if (!firstName || !lastName || !address || !password || !confirmPassword || !businessName || !phoneNum || !email) {
     return res.status(400).json({
       status: 400,
@@ -89,7 +88,7 @@ const signUp = async (req, res, next) => {
       password: hashedPassword,
       businessName,
       phoneNum,
-      logo: "logo.path",
+      logo: logo.path,
     });
     if (managers) {
       // return a success message on completion
@@ -145,7 +144,7 @@ const signIn = async (req, res, next) => {
         role: manager_role
       };
       // signing the token
-      jwt.sign(payload, process.env.secretOrkey, {
+      jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: 10800000
       }, (err, token) => {
         if (err) throw err;

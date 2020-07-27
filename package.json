@@ -4,8 +4,9 @@
   "description": "Event management application backend API",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "babel-node index.js",
     "dev": "nodemon --exec babel-node index.js",
+    "heroku-postbuild": "npm install",
     "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,6 +26,7 @@
     "@babel/preset-env": "^7.9.5",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.21.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-validator": "^6.5.0",
@@ -38,7 +40,8 @@
     "passport-jwt": "^4.0.0",
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^5.21.6"
+    "sequelize": "^5.21.6",
+    "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
