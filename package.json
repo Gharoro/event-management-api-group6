@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Event management application backend API",
   "main": "index.js",
-  "engines" : { "node" : ">=0.12", "npm": ">=6.13.7" },
+ 
   "scripts": {
     "start": "babel-node index.js",
     "dev": "nodemon --exec babel-node index.js",

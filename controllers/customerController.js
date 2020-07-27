@@ -75,7 +75,7 @@ const signup = async (req, res, next) => {
     if (checkExist) {
       return res.status(400).json({
         status: 400,
-        message: "Email taken choose another email"
+        error: "Email taken choose another email"
       });
     }
     // submit data if all information are valid
@@ -169,7 +169,7 @@ const signin = async (req, res, next) => {
 };
 
 const customerProfile = async (req, res, next) => {
- return res.json({
+ return res.status(200).json({
     success: true,
     message: 'Welcome',
     profile: {
