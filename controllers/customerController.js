@@ -126,7 +126,7 @@ const signin = async (req, res, next) => {
     });
 
     if (!customer) {
-      res.status(400).json({
+     return res.status(400).json({
         status: 400,
         message: "User does not Exist please check details supplied"
       });
@@ -169,7 +169,7 @@ const signin = async (req, res, next) => {
 };
 
 const customerProfile = async (req, res, next) => {
-  res.json({
+ return res.json({
     success: true,
     message: 'Welcome',
     profile: {
