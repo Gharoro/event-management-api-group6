@@ -146,7 +146,7 @@ const signin = async (req, res, next) => {
       };
 
       // sign token with the details
-      jwt.sign(payload, process.env.secretOrkey, {
+      jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: 10800000
       }, ((error, token) => {
         if (error) throw error;
