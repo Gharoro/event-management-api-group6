@@ -81,7 +81,11 @@ const addCenter = async (req, res, next) => {
 
 const viewAllCenters = async (req, res, next) => {
   try {
-    const centers = await models.Centers.findAll();
+    const centers = await models.Centers.findAll({
+      order: [
+        ['createdAt', 'ASC']
+      ],
+    });
     if (centers.length < 1) {
       return res.status(404).json({
         status: 404,
