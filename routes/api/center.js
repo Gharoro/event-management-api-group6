@@ -9,7 +9,8 @@ import {
   deleteCenter,
   updateCenter,
   setUnavailableDates,
-  removeDates
+  removeDates,
+  searchCenters
 } from "../../controllers/centersController";
 import {
   adminProtect
@@ -20,6 +21,7 @@ const router = Router();
 
 router.post("/add_center", adminProtect, parser.single("image"), addCenter);
 router.get("/view_all_centers", viewAllCenters);
+router.get("/search/q", searchCenters);
 router.get("/view_one_center/:id", viewOneCenter);
 router.delete("/delete_center/:id", adminProtect, deleteCenter);
 router.patch("/set_date/:id", adminProtect, setUnavailableDates);

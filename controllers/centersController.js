@@ -1,4 +1,6 @@
 import models from "../models/index";
+import paginate from "../middleware/paginate";
+
 import {
   Op
 } from "sequelize";
@@ -359,6 +361,129 @@ const removeDates = async (req, res, next) => {
   }
 }
 
+const searchCenters = async (req, res, next) => {
+  let {
+    location,
+    purpose,
+    guest_num,
+    page,
+    pageSize
+  } = req.query;
+  // ensuring page and pageSize are integers
+  page = parseInt(req.query.page, 10);
+  pageSize = parseInt(req.query.pageSize, 10);
+
+  page = (isNaN(page)) ? 1 : page;
+  pageSize = (isNaN(pageSize)) ? 3 : pageSize;
+  guest_num = (guest_num === undefined) ? 0 : guest_num;
+
+  if (page < 0 || page === 0) {
+    return res.status(404).json({
+      status: 404,
+      error: 'Invalid page number',
+    });
+  }
+  if (pageSize > 3) {
+    return res.status(404).json({
+      status: 404,
+      error: 'Page size cannot exceed 3',
+    });
+  }
+  if (!location && !purpose && !guest_num) {
+    const check = await models.Centers.findAndCountAll();
+    const count = check.count;
+    const totalPages = Math.ceil(count / pageSize);
+    const query = paginate({
+      where: {}, // conditions
+      order: [
+        ['createdAt', 'ASC']
+      ],
+    }, {
+      page,
+      pageSize,
+      count
+    }, )
+
+    try {
+      const centers = await models.Centers.findAll(query);
+      if (centers.length < 1) {
+        return res.status(404).json({
+          status: 404,
+          error: 'There are no centers at the moment',
+        });
+      }
+
+      return res.status(200).json({
+        status: 200,
+        pagination: {
+          total_centers: count,
+          page_num: page,
+          total_pages: totalPages,
+          pagination_links: query.paginate_links,
+        },
+        result: centers,
+      });
+    } catch (error) {
+      console.log(error);
+      return next();
+    }
+  }
+  console.log('i get here', guest_num);
+  const check = await models.Centers.findAll({
+    where: {
+      location: location,
+      capacity: {
+        [Op.gte]: guest_num
+      }
+    }
+  });
+
+  const count = check.length;
+  const totalPages = Math.ceil(count / pageSize);
+
+  // search by query
+  const query = paginate({
+    where: {
+      location: location,
+      capacity: {
+        [Op.gte]: guest_num
+      }
+    }, // conditions
+    order: [
+      ['createdAt', 'ASC']
+    ],
+  }, {
+    page,
+    pageSize,
+    count
+  }, )
+
+  try {
+    const centers = await models.Centers.findAll(query);
+    if (centers.length < 1) {
+      return res.status(404).json({
+        status: 404,
+        error: 'There are no centers matching your search',
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: `${count} Event Centres, for ${guest_num} and above guests in ${location}`,
+      pagination: {
+        total_centers: count,
+        page_num: page,
+        total_pages: totalPages,
+        pagination_links: query.paginate_links,
+      },
+      result: centers,
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+}
+
 export {
   addCenter,
   viewAllCenters,
@@ -366,5 +491,6 @@ export {
   deleteCenter,
   updateCenter,
   setUnavailableDates,
-  removeDates
+  removeDates,
+  searchCenters
 };
