@@ -41,6 +41,10 @@ app.get("/", (req, res) => {
   })
 });
 
+app.get("/api-docs", (req, res) => {
+  res.redirect('https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest');
+});
+
 const port = process.env.PORT || 900;
 
 app.listen(port, () => {
