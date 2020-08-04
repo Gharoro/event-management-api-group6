@@ -8,7 +8,7 @@
     "dev": "nodemon --exec babel-node index.js",
     "heroku-postbuild": "npm install",
     "lint": "eslint",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "env NODE_ENV=test nyc --reporter=html mocha --require @babel/register --watch --timeout 10000"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,8 @@
     "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.9.5",
+    "@babel/register": "^7.10.5",
+    "@babel/runtime": "^7.11.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.21.0",
     "cors": "^2.8.5",
@@ -44,9 +46,14 @@
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
-    "nodemon": "^2.0.4"
+    "mocha": "^8.1.0",
+    "nodemon": "^2.0.4",
+    "nyc": "^15.1.0"
   }
 }

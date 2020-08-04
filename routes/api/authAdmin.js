@@ -19,4 +19,5 @@ router.post("/signup", parser.single("logo"), signUp);
 router.post("/signin", signIn);
 router.get("/profile", adminProtect, adminProfile);
 
+
 export default router;

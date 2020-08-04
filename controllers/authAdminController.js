@@ -90,20 +90,17 @@ const signUp = async (req, res, next) => {
       phoneNum,
       logo: logo.path,
     });
-    if (managers) {
-      // return a success message on completion
-      return res.json({
-        status: 200,
-        message: 'Account created successfully',
-      });
-    }
+    // return a success message on completion
+    return res.status(200).json({
+      status: 200,
+      message: 'Account created successfully',
+    });
+  } catch (error) {
     // return an error message on failure
     return res.status(500).json({
       status: 500,
-      message: 'Unable to create user at the moment',
+      error: 'Unable to create user at the moment',
     });
-  } catch (error) {
-    return next(error);
   }
 };
 
@@ -166,22 +163,27 @@ const signIn = async (req, res, next) => {
 };
 
 const adminProfile = async (req, res, next) => {
-  return res.json({
-    success: true,
-    message: 'Welcome Admin',
-    profile: {
-      id: req.user.id,
-      firstname: req.user.firstName,
-      lastname: req.user.lastName,
-      email: req.user.email,
-      phone_number: req.user.phoneNum,
-      role: req.user.role,
-      business_name: req.user.businessName,
-      address: req.user.address,
-      logo: req.user.logo,
-      register_date: req.user.createdAt,
-    }
-  });
+  try {
+    return res.status(200).json({
+      success: true,
+      message: 'Welcome Admin',
+      profile: {
+        id: req.user.id,
+        firstname: req.user.firstName,
+        lastname: req.user.lastName,
+        email: req.user.email,
+        phone_number: req.user.phoneNum,
+        role: req.user.role,
+        business_name: req.user.businessName,
+        address: req.user.address,
+        logo: req.user.logo,
+        register_date: req.user.createdAt,
+      }
+    });
+  } catch (error) {
+    console.log('Error: ', error);
+  }
+
 }
 
 export {
