@@ -1,10 +1,8 @@
 // Authentication for customer signup and signin
 import models from "../models";
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken';
-import {
-  config
-} from 'dotenv';
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
 
 config();
 
@@ -17,7 +15,7 @@ const signup = async (req, res, next) => {
     confirm_password,
     email,
     phone_number,
-    gender
+    gender,
   } = req.body;
 
   if (
@@ -29,10 +27,9 @@ const signup = async (req, res, next) => {
     !phone_number ||
     !gender
   ) {
-    
     return res.status(400).json({
       status: 400,
-      message: "All fields are required"
+      message: "All fields are required",
     });
   }
   if (
@@ -41,41 +38,41 @@ const signup = async (req, res, next) => {
   ) {
     return res.status(400).json({
       status: 400,
-      message: "firstname and lastname must  be alphabets"
+      message: "firstname and lastname must  be alphabets",
     });
   }
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (!re.test(email)) {
     return res.status(400).json({
       status: 400,
-      message: "Email do not match correct format"
+      message: "Email do not match correct format",
     });
   }
   const phoneNumStr = phone_number.split("");
   if (phoneNumStr.length !== 11 || phone_number.match(/[^0-9]/g)) {
     return res.status(400).json({
       status: 400,
-      message: "Phone number must be a number equal to 11 numbers"
+      message: "Phone number must be a number equal to 11 numbers",
     });
   }
   if (password !== confirm_password) {
     return res.status(400).json({
       status: 400,
-      message: "password must match"
+      message: "password must match",
     });
   }
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const checkExist = await models.customers.findOne({
       where: {
-        email
-      }
+        email,
+      },
     });
     //  throw an error if the user alreaddy exist
     if (checkExist) {
       return res.status(400).json({
         status: 400,
-        error: "Email taken choose another email"
+        error: "Email taken choose another email",
       });
     }
     // submit data if all information are valid
@@ -87,18 +84,18 @@ const signup = async (req, res, next) => {
       email,
       phone_number,
       gender,
-      role: "user"
+      role: "user",
     });
     // If account creation is successful return a success message and the data
     if (customer) {
       return res.status(200).json({
         status: 200,
-        message: "Your account has been successfully created"
+        message: "Your account has been successfully created",
       });
     }
     return res.status(500).json({
       status: 500,
-      message: "Unable to create an account at this time, try again"
+      message: "Unable to create an account at this time, try again",
     });
   } catch (error) {
     return next(error);
@@ -106,29 +103,26 @@ const signup = async (req, res, next) => {
 };
 
 const signin = async (req, res, next) => {
-  const {
-    email,
-    password
-  } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
       status: 400,
-      message: "All fields are required"
+      message: "All fields are required",
     });
   }
 
   try {
     const customer = await models.customers.findOne({
       where: {
-        email
-      }
+        email,
+      },
     });
 
     if (!customer) {
-     return res.status(400).json({
+      return res.status(400).json({
         status: 400,
-        message: "User does not Exist please check details supplied"
+        message: "User does not Exist please check details supplied",
       });
     }
 
@@ -142,26 +136,31 @@ const signin = async (req, res, next) => {
     if (password_match) {
       const payload = {
         id,
-        role
+        role,
       };
 
       // sign token with the details
-      jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 10800000
-      }, ((error, token) => {
-        if (error) throw error;
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        {
+          expiresIn: 10800000,
+        },
+        (error, token) => {
+          if (error) throw error;
 
-        return res.status(200).json({
-          status: 200,
-          message: 'Login Successful',
-          token: `Bearer ${token}`
-        })
-      }))
+          return res.status(200).json({
+            status: 200,
+            message: "Login Successful",
+            token: `Bearer ${token}`,
+          });
+        }
+      );
     } else
       return res.status(400).json({
         status: 400,
-        message: 'Incorrect Password'
-      })
+        message: "Incorrect Password",
+      });
   } catch (error) {
     console.log(error);
     return next(error);
@@ -169,9 +168,9 @@ const signin = async (req, res, next) => {
 };
 
 const customerProfile = async (req, res, next) => {
- return res.status(200).json({
+  return res.status(200).json({
     success: true,
-    message: 'Welcome',
+    message: "Welcome",
     profile: {
       id: req.user.id,
       firstname: req.user.firstname,
@@ -181,15 +180,32 @@ const customerProfile = async (req, res, next) => {
       role: req.user.role,
       gender: req.user.gender,
       register_date: req.user.createdAt,
-    }
+    },
   });
-}
-
-
-
-export {
-  signup,
-  signin,
-  customerProfile,
-  
 };
+
+const customerBookings = async (req, res, next) => {
+  const customer_id = req.user.id;
+  try {
+    const customer_bookings = await models.booking.findAll({
+      where: {
+        customerId: customer_id,
+      },
+    });
+    if (customer_bookings.length < 1) {
+      return res.status(404).json({
+        status: 404,
+        error: "You do not have any bookings",
+      });
+    }
+    return res.status(200).json({
+      status: 200,
+      customer_bookings,
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+
+export { signup, signin, customerProfile, customerBookings };
