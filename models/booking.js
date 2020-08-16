@@ -1,70 +1,71 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
   const booking = sequelize.define(
-    "booking", {
+    "booking",
+    {
       status: {
         type: DataTypes.STRING,
-        defaultValue: "Pending"
+        defaultValue: "Pending",
       },
       event_date: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       from_time: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       to_time: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       purpose: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       customerId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       additional_info: DataTypes.STRING,
       amount_paid: {
         type: DataTypes.DECIMAL,
-        defaultValue: 0.00
+        defaultValue: 0.0,
       },
       balance: {
         type: DataTypes.DECIMAL,
-        defaultValue: 0.00
+        defaultValue: 0.0,
       },
       centerId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       payment_proof: {
         type: DataTypes.STRING,
       },
       referrence: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       paid_at: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: true,
       },
       channel: {
         type: DataTypes.STRING,
-        allowNull: true
-      }
-    }, {}
+        allowNull: true,
+      },
+    },
+    {}
   );
   booking.associate = function (models) {
     // associations can be defined here
-    booking.belongsTo(models.Centers, {
-      foreignKey: 'centerId'
-    });
-
-    booking.belongsTo(models.customers, {
-      foreignKey: 'customerId'
-    });
+    // booking.belongsTo(models.Centers, {
+    //   foreignKey: 'centerId'
+    // });
+    // booking.belongsTo(models.customers, {
+    //   foreignKey: 'customerId'
+    // });
   };
   return booking;
 };
