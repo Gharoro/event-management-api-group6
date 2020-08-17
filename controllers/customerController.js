@@ -208,24 +208,4 @@ const customerBookings = async (req, res, next) => {
   }
 };
 
-const customerBooking = async (req, res, next) => {
-  try {
-    const booking_id = req.params.id;
-    const booking = await models.booking.findByPk(booking_id);
-    if (!booking) {
-      return res.status(404).json({
-        status: 404,
-        error: "Booking does not exist",
-      });
-    }
-    return res.status(200).json({
-      status: 200,
-      booking,
-    });
-  } catch (error) {
-    console.log(error);
-    return next();
-  }
-};
-
-export { signup, signin, customerProfile, customerBookings, customerBooking };
+export { signup, signin, customerProfile, customerBookings };

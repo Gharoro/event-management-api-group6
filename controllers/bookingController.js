@@ -278,6 +278,26 @@ const customerViewBookings = async (req, res, next) => {
   });
 };
 
+const singleBooking = async (req, res, next) => {
+  try {
+    const booking_id = req.params.bookingId;
+    const booking = await models.booking.findByPk(booking_id);
+    if (!booking) {
+      return res.status(404).json({
+        status: 404,
+        error: "Booking does not exist",
+      });
+    }
+    return res.status(200).json({
+      status: 200,
+      booking,
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+
 const pendingBookings = async (req, res, next) => {
   const { id } = req.user;
   try {
@@ -296,20 +316,6 @@ const pendingBookings = async (req, res, next) => {
         ["createdAt", "date of booking"],
       ],
       where: { customerId: id, status: "Pending" },
-      include: [
-        {
-          model: models.Centers,
-          attributes: [
-            "name",
-            "description",
-            "capacity",
-            "facilities",
-            "location",
-            "images",
-            "price",
-          ],
-        },
-      ],
     });
     return res.status(200).json({
       status: 200,
@@ -339,20 +345,6 @@ const paidBookings = async (req, res, next) => {
         ["createdAt", "date of booking"],
       ],
       where: { customerId: id, status: "Paid" },
-      include: [
-        {
-          model: models.Centers,
-          attributes: [
-            "name",
-            "description",
-            "capacity",
-            "facilities",
-            "location",
-            "images",
-            "price",
-          ],
-        },
-      ],
     });
     return res.status(200).json({
       status: 200,
@@ -381,6 +373,7 @@ export {
   initializePayment,
   verifyPayment,
   customerViewBookings,
+  singleBooking,
   pendingBookings,
   paidBookings,
   pastBookings,

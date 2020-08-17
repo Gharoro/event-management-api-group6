@@ -9,7 +9,8 @@ import {
   customerViewBookings,
   pendingBookings,
   paidBookings,
-  pastBookings
+  pastBookings,
+  singleBooking,
 } from "../../controllers/bookingController";
 import { customerProtect } from "../../middleware/auth";
 
@@ -20,8 +21,9 @@ router.get("/customer/viewall", customerProtect, customerViewBookings);
 router.get("/customer/pending", customerProtect, pendingBookings);
 router.get("/customer/paid", customerProtect, paidBookings);
 router.get("/customer/past", customerProtect, pastBookings);
+router.get("/:bookingId", customerProtect, singleBooking);
 router.patch(
-  "/:centerId/:bookingId/cancelBooking",
+  "/:centerId/:bookingId/cancel_booking",
   customerProtect,
   cancelBooking
 );
