@@ -266,4 +266,122 @@ const verifyPayment = async (req, res, next) => {
   }
 };
 
-export { makeBooking, cancelBooking, initializePayment, verifyPayment };
+const customerViewBookings = async (req, res, next) => {
+  const { id } = req.user;
+  const results = await models.booking.findAll({
+    where: { customerId: id },
+  });
+
+  return res.status(200).json({
+    status: 200,
+    message: results,
+  });
+};
+
+const pendingBookings = async (req, res, next) => {
+  const { id } = req.user;
+  try {
+    const results = await models.booking.findAll({
+      attributes: [
+        "status",
+        "event_date",
+        "from_time",
+        "to_time",
+        "purpose",
+        "additional_info",
+        "amount_paid",
+        "balance",
+        "paid_at",
+        "channel",
+        ["createdAt", "date of booking"],
+      ],
+      where: { customerId: id, status: "Pending" },
+      include: [
+        {
+          model: models.Centers,
+          attributes: [
+            "name",
+            "description",
+            "capacity",
+            "facilities",
+            "location",
+            "images",
+            "price",
+          ],
+        },
+      ],
+    });
+    return res.status(200).json({
+      status: 200,
+      message: results,
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+
+const paidBookings = async (req, res, next) => {
+  const { id } = req.user;
+  try {
+    const results = await models.booking.findAll({
+      attributes: [
+        "status",
+        "event_date",
+        "from_time",
+        "to_time",
+        "purpose",
+        "additional_info",
+        "amount_paid",
+        "balance",
+        "paid_at",
+        "channel",
+        ["createdAt", "date of booking"],
+      ],
+      where: { customerId: id, status: "Paid" },
+      include: [
+        {
+          model: models.Centers,
+          attributes: [
+            "name",
+            "description",
+            "capacity",
+            "facilities",
+            "location",
+            "images",
+            "price",
+          ],
+        },
+      ],
+    });
+    return res.status(200).json({
+      status: 200,
+      message: results,
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+const pastBookings = async (req, res, next) => {
+  try {
+    return res.status(200).json({
+      status: 200,
+      message: "See past bookings here",
+    });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+};
+
+export {
+  makeBooking,
+  cancelBooking,
+  initializePayment,
+  verifyPayment,
+  customerViewBookings,
+  pendingBookings,
+  paidBookings,
+  pastBookings,
+};
