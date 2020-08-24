@@ -12,7 +12,7 @@ import connect from "./config/dbconnection";
 const app = express();
 
 // Enabling CORS
-app.use(cors());
+app.use(cors({ credentials: true }));
 
 // Connecting to database
 connect();
