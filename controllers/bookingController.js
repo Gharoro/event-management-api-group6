@@ -9,12 +9,12 @@ config();
 const makeBooking = async (req, res, next) => {
   const { event_date, from_time, to_time, purpose, additional_info } = req.body;
 
-  if (!event_date || !from_time || !to_time || !purpose) {
-    return res.status(400).json({
-      status: 400,
-      error: "all required fileds must be filled before booking an event",
-    });
-  }
+  // if (!event_date || !from_time || !to_time || !purpose) {
+  //   return res.status(400).json({
+  //     status: 400,
+  //     error: "all required fileds must be filled before booking an event",
+  //   });
+  // }
 
   try {
     const customerId = req.user.id;
@@ -62,7 +62,6 @@ const makeBooking = async (req, res, next) => {
       return res.status(200).json({
         status: 200,
         success: "You have successfully book this Hall",
-        bookingID: newBooking.id,
       });
     }
     return res.status(500).json({
