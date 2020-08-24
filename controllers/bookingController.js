@@ -62,6 +62,7 @@ const makeBooking = async (req, res, next) => {
       return res.status(200).json({
         status: 200,
         success: "You have successfully book this Hall",
+        bookingID: newBooking.id,
       });
     }
     return res.status(500).json({
