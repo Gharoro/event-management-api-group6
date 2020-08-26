@@ -269,7 +269,9 @@ const verifyPayment = async (req, res, next) => {
 const customerViewBookings = async (req, res, next) => {
   const { id } = req.user;
   const results = await models.booking.findAll({
-    where: { customerId: id },
+    include: {model: models.Centers},
+    where: { customerId: id 
+    },
   });
 
   return res.status(200).json({

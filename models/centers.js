@@ -48,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     Center.belongsTo(models.Manager, {
       foreignKey: 'manager_id'
     });
+    Center.hasMany(models.booking, {foreignKey: 'id'});
   };
   return Center;
 };
