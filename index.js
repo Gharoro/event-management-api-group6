@@ -1,6 +1,6 @@
 import express from "express";
 import morgan from "morgan";
-import cors from 'cors';
+import cors from "cors";
 
 import auth from "./routes/api/authAdmin";
 import customer from "./routes/api/customer";
@@ -12,7 +12,7 @@ import connect from "./config/dbconnection";
 const app = express();
 
 // Enabling CORS
-app.use(cors());
+app.use(cors({ credentials: true }));
 
 // Connecting to database
 connect();
@@ -21,7 +21,7 @@ connect();
 app.use(express.json());
 app.use(
   express.urlencoded({
-    extended: true
+    extended: true,
   })
 );
 app.use(morgan("tiny"));
@@ -36,13 +36,13 @@ app.get("/", (req, res) => {
   // res.send("Welcome to Magnitude Event Manager - SGA Group 6");
   res.status(200).json({
     success: true,
-    message: 'Hello there! Welcome to Magnitude Event Manager.',
-    api_doc: 'https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest'
-  })
+    message: "Magnitude Event Manager API - GROUP 6.",
+    api_doc: "https://documenter.getpostman.com/view/6511530/T17NbQMH",
+  });
 });
 
 app.get("/api-docs", (req, res) => {
-  res.redirect('https://documenter.getpostman.com/view/6511530/T17NbQMH?version=latest');
+  res.redirect("https://documenter.getpostman.com/view/6511530/T17NbQMH");
 });
 
 const port = process.env.PORT || 900;
