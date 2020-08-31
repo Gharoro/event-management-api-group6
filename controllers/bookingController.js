@@ -62,6 +62,7 @@ const makeBooking = async (req, res, next) => {
       return res.status(200).json({
         status: 200,
         success: "You have successfully book this Hall",
+        bookingId: newBooking.id,
       });
     }
     return res.status(500).json({
@@ -269,9 +270,8 @@ const verifyPayment = async (req, res, next) => {
 const customerViewBookings = async (req, res, next) => {
   const { id } = req.user;
   const results = await models.booking.findAll({
-    include: {model: models.Centers},
-    where: { customerId: id 
-    },
+    include: { model: models.Centers },
+    where: { customerId: id },
   });
 
   return res.status(200).json({
