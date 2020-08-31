@@ -272,6 +272,7 @@ const customerViewBookings = async (req, res, next) => {
   const results = await models.booking.findAll({
     include: { model: models.Centers },
     where: { customerId: id },
+    order: ["createdAt", "DESC"],
   });
 
   return res.status(200).json({
